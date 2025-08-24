@@ -1,0 +1,167 @@
+service: dva-c02-course
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-1
+  stage: ${opt:stage, 'dev'}
+  
+custom:
+  customDomain:
+    domainName: ${self:custom.domains.${self:provider.stage}}
+    certificateName: '*.sstechnologies-cloud.com'
+    createRoute53Record: true
+    endpointType: 'regional'
+    securityPolicy: tls_1_2
+    apiType: rest
+    autoDomain: false
+  
+  domains:
+    dev: dev-dva.sstechnologies-cloud.com
+    staging: staging-dva.sstechnologies-cloud.com
+    prod: dva.sstechnologies-cloud.com
+  
+  s3Sync:
+    - bucketName: ${self:custom.buckets.${self:provider.stage}}
+      localDir: ./
+      acl: public-read
+      followSymlinks: true
+      defaultContentType: text/html
+      params:
+        - "*.html":
+            ContentType: text/html
+        - "*.css":
+            ContentType: text/css
+        - "*.js":
+            ContentType: application/javascript
+        - "*.json":
+            ContentType: application/json
+  
+  buckets:
+    dev: dva-c02-course-dev-${aws:accountId}
+    staging: dva-c02-course-staging-${aws:accountId}
+    prod: dva-c02-course-prod-${aws:accountId}
+
+resources:
+  Resources:
+    # S3 Bucket para hospedagem
+    WebsiteBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.buckets.${self:provider.stage}}
+        WebsiteConfiguration:
+          IndexDocument: index.html
+          ErrorDocument: index.html
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: false
+          BlockPublicPolicy: false
+          IgnorePublicAcls: false
+          RestrictPublicBuckets: false
+    
+    # Bucket Policy para acesso público
+    WebsiteBucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        Bucket: !Ref WebsiteBucket
+        PolicyDocument:
+          Statement:
+            - Sid: PublicReadGetObject
+              Effect: Allow
+              Principal: '*'
+              Action: s3:GetObject
+              Resource: !Sub '${WebsiteBucket}/*'
+    
+    # CloudFront Distribution
+    CloudFrontDistribution:
+      Type: AWS::CloudFront::Distribution
+      Properties:
+        DistributionConfig:
+          Origins:
+            - DomainName: !GetAtt WebsiteBucket.RegionalDomainName
+              Id: S3Origin
+              S3OriginConfig:
+                OriginAccessIdentity: ''
+          Enabled: true
+          DefaultRootObject: index.html
+          CustomErrorResponses:
+            - ErrorCode: 404
+              ResponseCode: 200
+              ResponsePagePath: /index.html
+          DefaultCacheBehavior:
+            TargetOriginId: S3Origin
+            ViewerProtocolPolicy: redirect-to-https
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+            CachedMethods:
+              - GET
+              - HEAD
+            ForwardedValues:
+              QueryString: false
+              Cookies:
+                Forward: none
+            Compress: true
+            DefaultTTL: 86400
+            MaxTTL: 31536000
+          Aliases:
+            - ${self:custom.domains.${self:provider.stage}}
+          ViewerCertificate:
+            AcmCertificateArn: 
+              Ref: SSLCertificate
+            SslSupportMethod: sni-only
+            MinimumProtocolVersion: TLSv1.2_2021
+    
+    # SSL Certificate
+    SSLCertificate:
+      Type: AWS::CertificateManager::Certificate
+      Properties:
+        DomainName: ${self:custom.domains.${self:provider.stage}}
+        ValidationMethod: DNS
+        DomainValidationOptions:
+          - DomainName: ${self:custom.domains.${self:provider.stage}}
+            HostedZoneId: !Ref HostedZone
+    
+    # Route53 Hosted Zone
+    HostedZone:
+      Type: AWS::Route53::HostedZone
+      Properties:
+        Name: sstechnologies-cloud.com
+    
+    # Route53 Record
+    DNSRecord:
+      Type: AWS::Route53::RecordSet
+      Properties:
+        HostedZoneId: !Ref HostedZone
+        Name: ${self:custom.domains.${self:provider.stage}}
+        Type: A
+        AliasTarget:
+          DNSName: !GetAtt CloudFrontDistribution.DomainName
+          HostedZoneId: Z2FDTNDATAQYW2 # CloudFront HostedZoneId
+
+  Outputs:
+    WebsiteURL:
+      Description: Website URL
+      Value: https://${self:custom.domains.${self:provider.stage}}
+    
+    CloudFrontDistributionId:
+      Description: CloudFront Distribution ID
+      Value: !Ref CloudFrontDistribution
+    
+    S3BucketName:
+      Description: S3 Bucket Name
+      Value: !Ref WebsiteBucket
+
+plugins:
+  - serverless-s3-sync
+  - serverless-domain-manager
+  - serverless-cloudfront-invalidate
+
+package:
+  patterns:
+    - '!node_modules/**'
+    - '!.git/**'
+    - '!.github/**'
+    - '!README.md'
+    - '!serverless.yml'
+    - '!package*.json'

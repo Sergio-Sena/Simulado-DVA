@@ -1,0 +1,254 @@
+name: Deploy DVA-C02 Course
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+
+env:
+  NODE_VERSION: '18'
+  AWS_REGION: 'us-east-1'
+
+jobs:
+  # Job de validação e testes
+  validate:
+    name: Validate & Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Validate HTML
+        run: |
+          # Validação básica de HTML
+          echo "Validating HTML files..."
+          for file in *.html; do
+            if [[ -f "$file" ]]; then
+              echo "Checking $file..."
+              # Verificar se arquivos têm estrutura básica
+              grep -q "<!DOCTYPE html>" "$file" || (echo "Missing DOCTYPE in $file" && exit 1)
+              grep -q "<html" "$file" || (echo "Missing html tag in $file" && exit 1)
+              grep -q "</html>" "$file" || (echo "Missing closing html tag in $file" && exit 1)
+            fi
+          done
+      
+      - name: Validate JavaScript
+        run: |
+          # Verificar sintaxe JavaScript
+          echo "Validating JavaScript files..."
+          for file in *.js; do
+            if [[ -f "$file" ]]; then
+              echo "Checking $file..."
+              node -c "$file" || (echo "Syntax error in $file" && exit 1)
+            fi
+          done
+      
+      - name: Check file sizes
+        run: |
+          # Verificar se arquivos não são muito grandes
+          echo "Checking file sizes..."
+          find . -name "*.html" -o -name "*.css" -o -name "*.js" | while read file; do
+            size=$(stat -f%z "$file" 2>/dev/null || stat -c%s "$file" 2>/dev/null || echo 0)
+            if [ "$size" -gt 1048576 ]; then # 1MB
+              echo "Warning: $file is larger than 1MB ($size bytes)"
+            fi
+          done
+
+  # Deploy para Development
+  deploy-dev:
+    name: Deploy to Development
+    runs-on: ubuntu-latest
+    needs: validate
+    if: github.ref == 'refs/heads/develop'
+    environment: development
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      
+      - name: Deploy to Development
+        run: |
+          npm run deploy:dev
+          npm run sync:dev
+          npm run invalidate:dev
+      
+      - name: Comment PR with dev URL
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '🚀 Development deployment successful!\n\n📍 **Dev URL**: https://dev-dva.sstechnologies-cloud.com\n\n✅ Ready for testing!'
+            })
+
+  # Deploy para Staging
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: validate
+    if: github.ref == 'refs/heads/main'
+    environment: staging
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      
+      - name: Deploy to Staging
+        run: |
+          npm run deploy:staging
+          npm run sync:staging
+          npm run invalidate:staging
+      
+      - name: Run smoke tests
+        run: |
+          echo "Running smoke tests on staging..."
+          # Verificar se o site está acessível
+          curl -f https://staging-dva.sstechnologies-cloud.com || exit 1
+          echo "Staging deployment successful!"
+
+  # Deploy para Production (manual approval)
+  deploy-prod:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [validate, deploy-staging]
+    if: github.ref == 'refs/heads/main'
+    environment: production
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      
+      - name: Create deployment tag
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git tag -a "v1.0.$(date +%Y%m%d%H%M%S)" -m "Production deployment $(date)"
+          git push origin --tags
+      
+      - name: Deploy to Production
+        run: |
+          npm run deploy:prod
+          npm run sync:prod
+          npm run invalidate:prod
+      
+      - name: Verify production deployment
+        run: |
+          echo "Verifying production deployment..."
+          sleep 30 # Wait for CloudFront propagation
+          curl -f https://dva.sstechnologies-cloud.com || exit 1
+          echo "Production deployment successful!"
+      
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          release_name: Production Release v1.0.${{ github.run_number }}
+          body: |
+            🚀 **Production Deployment**
+            
+            **Changes in this release:**
+            ${{ github.event.head_commit.message }}
+            
+            **Deployed to:** https://dva.sstechnologies-cloud.com
+            
+            **Commit:** ${{ github.sha }}
+          draft: false
+          prerelease: false
+
+  # Rollback job (manual trigger)
+  rollback:
+    name: Rollback to Stable
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    environment: production
+    steps:
+      - name: Checkout stable version
+        uses: actions/checkout@v4
+        with:
+          ref: v1.0-stable
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      
+      - name: Rollback to stable version
+        run: |
+          npm run deploy:prod
+          npm run sync:prod
+          npm run invalidate:prod
+          echo "Rollback to stable version completed!"
