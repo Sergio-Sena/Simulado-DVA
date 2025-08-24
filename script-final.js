@@ -214,7 +214,7 @@ const courseData = {
                     explanation: "CodeDeploy oferece deployment canary para Lambda functions."
                 }
             ]
-        }
+        },
         {
             id: 3,
             title: "Dia 5-6: Containers + Elastic Beanstalk",
