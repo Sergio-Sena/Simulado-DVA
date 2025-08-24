@@ -1,0 +1,1387 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS DVA-C02 - Curso Intensivo</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .course-day {
+            background: white;
+            margin: 2rem 0;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        .day-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f8f9fa;
+        }
+        .day-number {
+            background: linear-gradient(135deg, #ff9900, #ff6600);
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-right: 1.5rem;
+        }
+        .day-content h3 {
+            color: #232f3e;
+            margin-bottom: 0.5rem;
+        }
+        .day-topics {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+        .topic-tag {
+            background: #e9ecef;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: #495057;
+        }
+        .day-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        .btn-study, .btn-quiz {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-study {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+        }
+        .btn-quiz {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+        }
+        .progress-section {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 15px;
+            margin: 2rem 0;
+            text-align: center;
+        }
+        .overall-progress {
+            background: #e9ecef;
+            height: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+        .progress-fill {
+            background: linear-gradient(90deg, #28a745, #20c997);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1><i class="fab fa-aws"></i> AWS DVA-C02 - Curso Intensivo</h1>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Início</a></li>
+                    <li><a href="curso-completo.html" class="active">Curso</a></li>
+                    <li><a href="laboratorios.html">Laboratórios</a></li>
+                    <li><a href="simulados.html">Simulados</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main style="margin-top: 100px;">
+        <section id="progresso" class="progress-section">
+            <div class="container">
+                <h2>📈 Seu Progresso no Curso</h2>
+                <div class="overall-progress">
+                    <div class="progress-fill" id="overallProgress"></div>
+                </div>
+                <p style="font-size: 1.2rem; font-weight: 600;"><span id="progressText">0% Concluído</span> - <span id="daysCompleted">0</span> de 14 módulos</p>
+                <div style="margin-top: 1.5rem;">
+                    <a href="simulados.html" style="background: linear-gradient(135deg, #ff9900, #ff6600); color: white; text-decoration: none; padding: 1rem 2rem; border-radius: 25px; font-weight: 600; display: inline-block; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                        🎯 Fazer Simulados
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section id="cronograma" class="section">
+            <div class="container">
+                <h2>📅 Cronograma Detalhado - 14 Dias</h2>
+                
+                <!-- SEMANA 1 -->
+                <div class="week-section">
+                    <h3 style="color: #232f3e; margin: 2rem 0 1rem 0;">🚀 SEMANA 1: FUNDAMENTOS E COMPUTE</h3>
+                    
+                    <div class="course-day">
+                        <div class="day-header">
+                            <div class="day-number">1-2</div>
+                            <div class="day-content">
+                                <h3>AWS Core Services + EC2 Deep Dive</h3>
+                                <p>Fundamentos AWS, IAM avançado, VPC networking, EC2 otimização</p>
+                            </div>
+                        </div>
+                        <div class="day-topics">
+                            <span class="topic-tag">Global Infrastructure</span>
+                            <span class="topic-tag">IAM Policies Avançadas</span>
+                            <span class="topic-tag">VPC Networking</span>
+                            <span class="topic-tag">EC2 Storage (EBS)</span>
+                            <span class="topic-tag">Security Groups vs NACLs</span>
+                        </div>
+                        <div class="day-actions">
+                            <button class="btn-study" onclick="mostrarConteudo('1-2')">
+                                <i class="fas fa-book"></i> Estudar Conteúdo
+                            </button>
+                            <button class="btn-quiz" onclick="iniciarQuiz('1-2')">
+                                <i class="fas fa-question-circle"></i> Fazer Quiz
+                            </button>
+                        </div>
+                        
+                        <!-- Conteúdo de Estudo -->
+                        <div id="conteudo-1-2" class="conteudo-estudo" style="display: none;">
+                            <h4>Conteúdo de Estudo - AWS Core + EC2</h4>
+                            <div class="cards-container">
+                                <div class="service-card">
+                                    <h5>Global Infrastructure</h5>
+                                    <p>Regiões, AZs, Edge Locations e como escolher a região ideal</p>
+                                    <ul>
+                                        <li>Mínimo 3 AZs por região</li>
+                                        <li>400+ Edge Locations</li>
+                                        <li>Latência < 50ms</li>
+                                        <li>Compliance regional</li>
+                                    </ul>
+                                </div>
+                                <div class="service-card">
+                                    <h5>IAM Policies Avançadas</h5>
+                                    <p>Políticas complexas, cross-account access, conditions</p>
+                                    <ul>
+                                        <li>Explicit Deny > Allow</li>
+                                        <li>Resource vs Identity policies</li>
+                                        <li>Conditions avançadas</li>
+                                        <li>AssumeRole pattern</li>
+                                    </ul>
+                                </div>
+                                <div class="service-card">
+                                    <h5>VPC Networking</h5>
+                                    <p>Route tables, Security Groups vs NACLs, NAT Gateway</p>
+                                    <ul>
+                                        <li>Longest prefix match</li>
+                                        <li>Stateful vs Stateless</li>
+                                        <li>Multi-AZ NAT</li>
+                                        <li>VPC Peering</li>
+                                    </ul>
+                                </div>
+                                <div class="service-card">
+                                    <h5>EC2 Storage (EBS)</h5>
+                                    <p>Tipos de EBS, performance, snapshots, encryption</p>
+                                    <ul>
+                                        <li>gp3 vs io2</li>
+                                        <li>IOPS vs Throughput</li>
+                                        <li>EBS-optimized</li>
+                                        <li>Encryption at rest</li>
+                                    </ul>
+                                </div>
+                                <div class="service-card">
+                                    <h5>Security Groups vs NACLs</h5>
+                                    <p>Diferenças, casos de uso, troubleshooting</p>
+                                    <ul>
+                                        <li>Stateful vs Stateless</li>
+                                        <li>Allow vs Deny rules</li>
+                                        <li>Instance vs Subnet level</li>
+                                        <li>Return traffic</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="course-day">
+                        <div class="day-header">
+                            <div class="day-number">3-4</div>
+                            <div class="day-content">
+                                <h3>Lambda + Serverless Architecture</h3>
+                                <p>Lambda avançado, API Gateway, Step Functions, event-driven patterns</p>
+                            </div>
+                        </div>
+                        <div class="day-topics">
+                            <span class="topic-tag">Lambda Lifecycle</span>
+                            <span class="topic-tag">Event Sources</span>
+                            <span class="topic-tag">API Gateway Auth</span>
+                            <span class="topic-tag">Step Functions</span>
+                            <span class="topic-tag">SAM Deployment</span>
+                        </div>
+                        <div class="day-actions">
+                            <button class="btn-study" onclick="mostrarConteudo('3-4')">
+                                <i class="fas fa-book"></i> Estudar Conteúdo
+                            </button>
+                            <button class="btn-quiz" onclick="iniciarQuiz('3-4')">
+                                <i class="fas fa-question-circle"></i> Fazer Quiz
+                            </button>
+                        </div>
+                        
+                        <!-- Conteúdo de Estudo -->
+                        <div id="conteudo-3-4" class="conteudo-estudo" style="display: none;">
+                            <h4>Conteúdo de Estudo - Lambda + Serverless</h4>
+                            <div class="cards-container">
+                                <div class="service-card">
+                                    <h5>Lambda Lifecycle</h5>
+                                    <p>Cold starts, warm containers, execution model</p>
+                                    <ul>
+                                        <li>Init → Invoke → Shutdown</li>
+                                        <li>15min timeout máximo</li>
+                                        <li>10GB memory máximo</li>
+                                        <li>Provisioned Concurrency</li>
+                                    </ul>
+                                </div>
+                                <div class="service-card">
+                                    <h5>Event Sources</h5>
+                                    <p>Sync vs Async vs Stream-based triggers</p>
+                                    <ul>
+                                        <li>API Gateway (sync)</li>
+                                        <li>S3 Events (async)</li>
+                                        <li>DynamoDB Streams</li>
+                                        <li>Error handling patterns</li>
+                                    </ul>
+                                </div>
+                                <div class="service-card">
+                                    <h5>API Gateway Auth</h5>
+                                    <p>Lambda Authorizer, Cognito, IAM, API Keys</p>
+                                    <ul>
+                                        <li>JWT validation</li>
+                                        <li>Policy generation</li>
+                                        <li>Context passing</li>
+                                        <li>Caching strategies</li>
+                                    </ul>
+                                </div>
+                                <div class="service-card">
+                                    <h5>Step Functions</h5>
+                                    <p>Workflow orchestration, state types, error handling</p>
+                                    <ul>
+                                        <li>Task, Choice, Parallel states</li>
+                                        <li>Retry/Catch patterns</li>
+                                        <li>Express vs Standard</li>
+                                        <li>ASL syntax</li>
+                                    </ul>
+                                </div>
+                                <div class="service-card">
+                                    <h5>SAM Deployment</h5>
+                                    <p>Infrastructure as Code, deployment strategies</p>
+                                    <ul>
+                                        <li>SAM templates</li>
+                                        <li>CodeDeploy integration</li>
+                                        <li>Canary deployments</li>
+                                        <li>Environment variables</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="course-day">
+                        <div class="day-header">
+                            <div class="day-number">5-6</div>
+                            <div class="day-content">
+                                <h3>Containers + Elastic Beanstalk</h3>
+                                <p>ECS, EKS, Fargate deployment strategies, Beanstalk configurations</p>
+                            </div>
+                        </div>
+                        <div class="day-topics">
+                            <span class="topic-tag">ECS vs EKS</span>
+                            <span class="topic-tag">Fargate Serverless</span>
+                            <span class="topic-tag">Task Definitions</span>
+                            <span class="topic-tag">Beanstalk Deployment</span>
+                            <span class="topic-tag">Docker Optimization</span>
+                        </div>
+                        <div class="day-actions">
+                            <button class="btn-study" onclick="mostrarConteudo('5-6')">
+                                <i class="fas fa-book"></i> Estudar Conteúdo
+                            </button>
+                            <button class="btn-quiz" onclick="iniciarQuiz('5-6')">
+                                <i class="fas fa-question-circle"></i> Fazer Quiz
+                            </button>
+                        </div>
+                        
+                        <!-- Conteúdo de Estudo -->
+                        <div id="conteudo-5-6" class="conteudo-estudo" style="display: none;">
+                            <h4>Conteúdo de Estudo - Containers + Elastic Beanstalk</h4>
+                            <div class="cards-container">
+                                <div class="service-card">
+                                    <h5>ECS vs EKS</h5>
+                                    <p>Container orchestration, managed vs self-managed</p>
+                                    <ul>
+                                        <li>ECS: AWS-native, simpler</li>
+                                        <li>EKS: Kubernetes-compatible</li>
+                                        <li>Fargate: serverless containers</li>
+                                        <li>EC2 launch type</li>
+                                    </ul>
+                                </div>
+                                <div class="service-card">
+                                    <h5>Fargate Serverless</h5>
+                                    <p>Serverless container platform</p>
+                                    <ul>
+                                        <li>No EC2 management</li>
+                                        <li>Pay per task</li>
+                                        <li>Auto-scaling</li>
+                                        <li>VPC networking</li>
+                                    </ul>
+                                </div>
+                                <div class="service-card">
+                                    <h5>Task Definitions</h5>
+                                    <p>Container configuration blueprint</p>
+                                    <ul>
+                                        <li>CPU/Memory allocation</li>
+                                        <li>Port mappings</li>
+                                        <li>Environment variables</li>
+                                        <li>IAM roles</li>
+                                    </ul>
+                                </div>
+                                <div class="service-card">
+                                    <h5>Beanstalk Deployment</h5>
+                                    <p>Platform-as-a-Service, easy deployment</p>
+                                    <ul>
+                                        <li>All-at-once deployment</li>
+                                        <li>Rolling deployment</li>
+                                        <li>Blue/Green deployment</li>
+                                        <li>Configuration management</li>
+                                    </ul>
+                                </div>
+                                <div class="service-card">
+                                    <h5>Docker Optimization</h5>
+                                    <p>Container best practices, performance</p>
+                                    <ul>
+                                        <li>Multi-stage builds</li>
+                                        <li>Layer caching</li>
+                                        <li>Security scanning</li>
+                                        <li>Resource limits</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="course-day">
+                        <div class="day-header">
+                            <div class="day-number">7</div>
+                            <div class="day-content">
+                                <h3>Revisão + Mini Simulado</h3>
+                                <p>Consolidação Semana 1, simulado 25 questões, análise performance</p>
+                            </div>
+                        </div>
+                        <div class="day-topics">
+                            <span class="topic-tag">Revisão Conceitos</span>
+                            <span class="topic-tag">Mini Simulado</span>
+                            <span class="topic-tag">Análise Gaps</span>
+                            <span class="topic-tag">Preparação Semana 2</span>
+                        </div>
+                        <div class="day-actions">
+                            <button class="btn-study" onclick="mostrarConteudo('7')">
+                                <i class="fas fa-book"></i> Estudar Conteúdo
+                            </button>
+                            <button class="btn-quiz" onclick="iniciarQuiz('7')">
+                                <i class="fas fa-question-circle"></i> Mini Simulado
+                            </button>
+                        </div>
+                        
+                        <!-- Conteúdo de Estudo -->
+                        <div id="conteudo-7" class="conteudo-estudo" style="display: none;">
+                            <h4>Conteúdo de Estudo - Revisão Semana 1</h4>
+                            <div class="cards-container">
+                                <div class="service-card">
+                                    <h5>Revisão AWS Core</h5>
+                                    <p>Fundamentos, IAM, VPC, EC2</p>
+                                    <ul>
+                                        <li>Global Infrastructure</li>
+                                        <li>IAM best practices</li>
+                                        <li>VPC networking</li>
+                                        <li>EC2 optimization</li>
+                                    </ul>
+                                </div>
+                                <div class="service-card">
+                                    <h5>Revisão Serverless</h5>
+                                    <p>Lambda, API Gateway, Step Functions</p>
+                                    <ul>
+                                        <li>Lambda lifecycle</li>
+                                        <li>Event sources</li>
+                                        <li>API Gateway patterns</li>
+                                        <li>Workflow orchestration</li>
+                                    </ul>
+                                </div>
+                                <div class="service-card">
+                                    <h5>Revisão Containers</h5>
+                                    <p>ECS, EKS, Fargate, Beanstalk</p>
+                                    <ul>
+                                        <li>Container orchestration</li>
+                                        <li>Deployment strategies</li>
+                                        <li>Task definitions</li>
+                                        <li>Platform services</li>
+                                    </ul>
+                                </div>
+                                <div class="service-card">
+                                    <h5>Mini Simulado</h5>
+                                    <p>25 questões dos módulos 1-6</p>
+                                    <ul>
+                                        <li>Tempo: 30 minutos</li>
+                                        <li>Nota mínima: 70%</li>
+                                        <li>Feedback detalhado</li>
+                                        <li>Identificar gaps</li>
+                                    </ul>
+                                </div>
+                                <div class="service-card">
+                                    <h5>Preparação Semana 2</h5>
+                                    <p>Storage, Database, DevOps</p>
+                                    <ul>
+                                        <li>S3 advanced features</li>
+                                        <li>Database strategies</li>
+                                        <li>Integration patterns</li>
+                                        <li>CI/CD pipelines</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SEMANA 2 -->
+                <div class="week-section">
+                    <h3 style="color: #232f3e; margin: 2rem 0 1rem 0;">🎯 SEMANA 2: STORAGE, DATABASE E DEVOPS</h3>
+                    
+                    <div class="course-day">
+                        <div class="day-header">
+                            <div class="day-number">8-9</div>
+                            <div class="day-content">
+                                <h3>S3 + Storage + Databases</h3>
+                                <p>S3 avançado, RDS, DynamoDB, ElastiCache, storage optimization</p>
+                            </div>
+                        </div>
+                        <div class="day-topics">
+                            <span class="topic-tag">S3 Storage Classes</span>
+                            <span class="topic-tag">DynamoDB Design</span>
+                            <span class="topic-tag">RDS Multi-AZ</span>
+                            <span class="topic-tag">ElastiCache Redis</span>
+                            <span class="topic-tag">Backup Strategies</span>
+                        </div>
+                        <div class="day-actions">
+                            <button class="btn-study" onclick="mostrarConteudo('8-9')">
+                                <i class="fas fa-book"></i> Estudar Conteúdo
+                            </button>
+                            <button class="btn-quiz" onclick="iniciarQuiz('8-9')">
+                                <i class="fas fa-question-circle"></i> Fazer Quiz
+                            </button>
+                        </div>
+                        
+                        <!-- Conteúdo de Estudo -->
+                        <div id="conteudo-8-9" class="conteudo-estudo" style="display: none;">
+                            <h4>Conteúdo de Estudo - S3 + Storage + Databases</h4>
+                            <div class="cards-container">
+                                <div class="service-card">
+                                    <h5>S3 Storage Classes</h5>
+                                    <p>Otimização de custos com classes de armazenamento</p>
+                                    <ul>
+                                        <li>Standard vs IA vs Glacier</li>
+                                        <li>Lifecycle policies</li>
+                                        <li>Cross-Region Replication</li>
+                                        <li>Versioning strategies</li>
+                                    </ul>
+                                </div>
+                                <div class="service-card">
+                                    <h5>DynamoDB Design</h5>
+                                    <p>Partition key design, GSI/LSI, capacity planning</p>
+                                    <ul>
+                                        <li>Hot partitions</li>
+                                        <li>GSI vs LSI</li>
+                                        <li>Provisioned vs On-Demand</li>
+                                        <li>DynamoDB Streams</li>
+                                    </ul>
+                                </div>
+                                <div class="service-card">
+                                    <h5>RDS Multi-AZ</h5>
+                                    <p>Alta disponibilidade, read replicas, backup strategies</p>
+                                    <ul>
+                                        <li>Multi-AZ vs Read Replicas</li>
+                                        <li>Automated backups</li>
+                                        <li>Point-in-time recovery</li>
+                                        <li>Cross-region replicas</li>
+                                    </ul>
+                                </div>
+                                <div class="service-card">
+                                    <h5>ElastiCache Redis</h5>
+                                    <p>Caching strategies, Redis vs Memcached</p>
+                                    <ul>
+                                        <li>Redis clustering</li>
+                                        <li>Persistence options</li>
+                                        <li>Pub/Sub patterns</li>
+                                        <li>Session storage</li>
+                                    </ul>
+                                </div>
+                                <div class="service-card">
+                                    <h5>Backup Strategies</h5>
+                                    <p>Cross-service backup, disaster recovery</p>
+                                    <ul>
+                                        <li>AWS Backup service</li>
+                                        <li>Cross-region backups</li>
+                                        <li>RTO/RPO planning</li>
+                                        <li>Automated testing</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="course-day">
+                        <div class="day-header">
+                            <div class="day-number">10-11</div>
+                            <div class="day-content">
+                                <h3>API Gateway + Integration</h3>
+                                <p>API Gateway avançado, SQS, SNS, EventBridge, integration patterns</p>
+                            </div>
+                        </div>
+                        <div class="day-topics">
+                            <span class="topic-tag">API Caching</span>
+                            <span class="topic-tag">SQS FIFO</span>
+                            <span class="topic-tag">SNS Fan-out</span>
+                            <span class="topic-tag">EventBridge Rules</span>
+                            <span class="topic-tag">Message Filtering</span>
+                        </div>
+                        <div class="day-actions">
+                            <button class="btn-study" onclick="mostrarConteudo('10-11')">
+                                <i class="fas fa-book"></i> Estudar Conteúdo
+                            </button>
+                            <button class="btn-quiz" onclick="iniciarQuiz('10-11')">
+                                <i class="fas fa-question-circle"></i> Fazer Quiz
+                            </button>
+                        </div>
+                        
+                        <!-- Conteúdo de Estudo -->
+                        <div id="conteudo-10-11" class="conteudo-estudo" style="display: none;">
+                            <h4>Conteúdo de Estudo - API Gateway + Integration</h4>
+                            <div class="cards-container">
+                                <div class="service-card">
+                                    <h5>API Caching</h5>
+                                    <p>Performance optimization, cache strategies</p>
+                                    <ul>
+                                        <li>TTL configuration</li>
+                                        <li>Cache keys</li>
+                                        <li>Cache invalidation</li>
+                                        <li>Cost optimization</li>
+                                    </ul>
+                                </div>
+                                <div class="service-card">
+                                    <h5>SQS FIFO</h5>
+                                    <p>Ordered message processing, deduplication</p>
+                                    <ul>
+                                        <li>Message ordering</li>
+                                        <li>Deduplication ID</li>
+                                        <li>Message groups</li>
+                                        <li>Throughput limits</li>
+                                    </ul>
+                                </div>
+                                <div class="service-card">
+                                    <h5>SNS Fan-out</h5>
+                                    <p>Publish-subscribe patterns, message distribution</p>
+                                    <ul>
+                                        <li>Topic subscriptions</li>
+                                        <li>Message filtering</li>
+                                        <li>Dead letter queues</li>
+                                        <li>Cross-region delivery</li>
+                                    </ul>
+                                </div>
+                                <div class="service-card">
+                                    <h5>EventBridge Rules</h5>
+                                    <p>Event-driven architecture, custom events</p>
+                                    <ul>
+                                        <li>Event patterns</li>
+                                        <li>Custom event bus</li>
+                                        <li>Partner integrations</li>
+                                        <li>Rule targets</li>
+                                    </ul>
+                                </div>
+                                <div class="service-card">
+                                    <h5>Message Filtering</h5>
+                                    <p>Selective message processing, cost optimization</p>
+                                    <ul>
+                                        <li>SNS filter policies</li>
+                                        <li>EventBridge patterns</li>
+                                        <li>Attribute-based routing</li>
+                                        <li>Conditional processing</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="course-day">
+                        <div class="day-header">
+                            <div class="day-number">12-13</div>
+                            <div class="day-content">
+                                <h3>CI/CD + Monitoring + Security</h3>
+                                <p>CodePipeline, CloudWatch, X-Ray, security best practices</p>
+                            </div>
+                        </div>
+                        <div class="day-topics">
+                            <span class="topic-tag">CodePipeline</span>
+                            <span class="topic-tag">CloudWatch Custom Metrics</span>
+                            <span class="topic-tag">X-Ray Tracing</span>
+                            <span class="topic-tag">Security Policies</span>
+                            <span class="topic-tag">Deployment Strategies</span>
+                        </div>
+                        <div class="day-actions">
+                            <button class="btn-study" onclick="mostrarConteudo('12-13')">
+                                <i class="fas fa-book"></i> Estudar Conteúdo
+                            </button>
+                            <button class="btn-quiz" onclick="iniciarQuiz('12-13')">
+                                <i class="fas fa-question-circle"></i> Fazer Quiz
+                            </button>
+                        </div>
+                        
+                        <!-- Conteúdo de Estudo -->
+                        <div id="conteudo-12-13" class="conteudo-estudo" style="display: none;">
+                            <h4>Conteúdo de Estudo - CI/CD + Monitoring + Security</h4>
+                            <div class="cards-container">
+                                <div class="service-card">
+                                    <h5>CodePipeline</h5>
+                                    <p>End-to-end CI/CD automation</p>
+                                    <ul>
+                                        <li>Source → Build → Deploy</li>
+                                        <li>Approval actions</li>
+                                        <li>Parallel stages</li>
+                                        <li>Rollback strategies</li>
+                                    </ul>
+                                </div>
+                                <div class="service-card">
+                                    <h5>CloudWatch Custom Metrics</h5>
+                                    <p>Application monitoring, custom dashboards</p>
+                                    <ul>
+                                        <li>PutMetricData API</li>
+                                        <li>Custom namespaces</li>
+                                        <li>Dimensions</li>
+                                        <li>Alarm thresholds</li>
+                                    </ul>
+                                </div>
+                                <div class="service-card">
+                                    <h5>X-Ray Tracing</h5>
+                                    <p>Distributed tracing, performance analysis</p>
+                                    <ul>
+                                        <li>Traces e segments</li>
+                                        <li>Annotations vs Metadata</li>
+                                        <li>Service map</li>
+                                        <li>Performance insights</li>
+                                    </ul>
+                                </div>
+                                <div class="service-card">
+                                    <h5>Security Policies</h5>
+                                    <p>IAM best practices, least privilege</p>
+                                    <ul>
+                                        <li>Resource-based policies</li>
+                                        <li>Cross-account access</li>
+                                        <li>Temporary credentials</li>
+                                        <li>Policy conditions</li>
+                                    </ul>
+                                </div>
+                                <div class="service-card">
+                                    <h5>Deployment Strategies</h5>
+                                    <p>Blue/Green, Canary, Rolling deployments</p>
+                                    <ul>
+                                        <li>Zero-downtime deployment</li>
+                                        <li>Rollback automation</li>
+                                        <li>Health checks</li>
+                                        <li>Traffic shifting</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 AWS DVA-C02 Curso Intensivo. Conteúdo baseado na documentação oficial da AWS.</p>
+        </div>
+    </footer>
+
+    <script src="banco-questoes.js"></script>
+    <style>
+        .conteudo-estudo {
+            margin-top: 2rem;
+            padding: 2rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .service-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-left: 4px solid #ff9900;
+        }
+        
+        .service-card h5 {
+            color: #232f3e;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+        
+        .service-card p {
+            color: #666;
+            margin-bottom: 1rem;
+            font-style: italic;
+        }
+        
+        .service-card ul {
+            margin: 0;
+            padding-left: 1.5rem;
+        }
+        
+        .service-card li {
+            margin: 0.5rem 0;
+            color: #495057;
+        }
+    </style>
+    <script>
+        // Funções para interação
+        function mostrarConteudo(dayNumber) {
+            const conteudo = document.getElementById(`conteudo-${dayNumber}`);
+            if (conteudo.style.display === 'none') {
+                conteudo.style.display = 'block';
+            } else {
+                conteudo.style.display = 'none';
+            }
+        }
+
+        function iniciarQuiz(dayNumber) {
+            // Quiz com 10 questões do módulo
+            const questoes = obterQuestoesModulo(dayNumber);
+            executarQuiz(questoes, `Módulo ${dayNumber}`);
+        }
+        
+        function obterQuestoesModulo(modulo) {
+            const questoesPorModulo = {
+                '1-2': [
+                    {
+                        question: "Qual é o número mínimo de AZs por região AWS?",
+                        options: ["2", "3", "4", "5"],
+                        correct: 1,
+                        explanation: "Cada região AWS tem no mínimo 3 Availability Zones."
+                    },
+                    {
+                        question: "Em uma política IAM, se houver Allow e Deny para a mesma ação:",
+                        options: ["Allow prevalece", "Deny prevalece", "Erro de política", "Depende da ordem"],
+                        correct: 1,
+                        explanation: "Explicit Deny sempre prevalece sobre Allow em políticas IAM."
+                    },
+                    {
+                        question: "Qual é a principal diferença entre Security Groups e NACLs?",
+                        options: ["SG é stateful, NACL é stateless", "SG é stateless, NACL é stateful", "Não há diferença", "SG é mais seguro"],
+                        correct: 0,
+                        explanation: "Security Groups são stateful (return traffic automático), NACLs são stateless."
+                    },
+                    {
+                        question: "Para 10,000 IOPS consistentes, qual tipo de EBS usar?",
+                        options: ["gp2", "gp3", "io1/io2", "st1"],
+                        correct: 2,
+                        explanation: "io1/io2 são otimizados para IOPS altos e consistentes."
+                    },
+                    {
+                        question: "Route tables usam qual critério para escolher rotas?",
+                        options: ["Primeira rota", "Última rota", "Longest prefix match", "Ordem alfabética"],
+                        correct: 2,
+                        explanation: "Route tables usam longest prefix match - a rota mais específica prevalece."
+                    },
+                    {
+                        question: "Para alta disponibilidade de NAT Gateway:",
+                        options: ["Um por VPC", "Um por AZ", "Um por subnet", "Não é necessário"],
+                        correct: 1,
+                        explanation: "Para alta disponibilidade, deve-se ter um NAT Gateway por AZ."
+                    },
+                    {
+                        question: "Edge Locations são usadas principalmente para:",
+                        options: ["Compute", "Storage", "CDN (CloudFront)", "Database"],
+                        correct: 2,
+                        explanation: "Edge Locations são pontos de presença para CloudFront CDN."
+                    },
+                    {
+                        question: "EBS-optimized instances oferecem:",
+                        options: ["Mais CPU", "Mais memória", "Bandwidth dedicada para EBS", "Mais storage"],
+                        correct: 2,
+                        explanation: "EBS-optimized garante bandwidth de rede dedicada para tráfego EBS."
+                    },
+                    {
+                        question: "Cross-account access é melhor implementado com:",
+                        options: ["Shared credentials", "AssumeRole", "Root access", "API Keys"],
+                        correct: 1,
+                        explanation: "AssumeRole é a melhor prática para acesso cross-account seguro."
+                    },
+                    {
+                        question: "VPC Peering permite:",
+                        options: ["Conectar VPCs na mesma região apenas", "Conectar VPCs cross-region", "Conectar todas as VPCs automaticamente", "Apenas VPCs da mesma conta"],
+                        correct: 1,
+                        explanation: "VPC Peering permite conectar VPCs na mesma região ou cross-region."
+                    }
+                ],
+                '3-4': [
+                    {
+                        question: "Qual é o timeout máximo para Lambda?",
+                        options: ["5 minutos", "10 minutos", "15 minutos", "30 minutos"],
+                        correct: 2,
+                        explanation: "Lambda tem timeout máximo de 15 minutos."
+                    },
+                    {
+                        question: "Para eliminar cold starts:",
+                        options: ["Aumentar memory", "Provisioned Concurrency", "Usar containers", "Reduzir código"],
+                        correct: 1,
+                        explanation: "Provisioned Concurrency mantém funções warm eliminando cold starts."
+                    },
+                    {
+                        question: "API Gateway payload máximo síncrono:",
+                        options: ["1MB", "6MB", "10MB", "256KB"],
+                        correct: 1,
+                        explanation: "API Gateway suporta até 6MB de payload para requests síncronos."
+                    },
+                    {
+                        question: "Step Functions Parallel state permite:",
+                        options: ["Execução sequencial", "Execução paralela", "Loops", "Condições"],
+                        correct: 1,
+                        explanation: "Parallel state executa múltiplos branches simultaneamente."
+                    },
+                    {
+                        question: "Lambda Authorizer deve retornar:",
+                        options: ["Boolean", "Policy IAM", "Token", "User ID"],
+                        correct: 1,
+                        explanation: "Lambda Authorizer deve retornar uma policy IAM válida."
+                    },
+                    {
+                        question: "DLQ (Dead Letter Queue) é usado para:",
+                        options: ["Performance", "Mensagens falhadas", "Logging", "Monitoring"],
+                        correct: 1,
+                        explanation: "DLQ armazena mensagens que falharam após tentativas de retry."
+                    },
+                    {
+                        question: "SAM é baseado em:",
+                        options: ["Terraform", "CloudFormation", "Ansible", "Kubernetes"],
+                        correct: 1,
+                        explanation: "SAM é uma extensão do CloudFormation para aplicações serverless."
+                    },
+                    {
+                        question: "Lambda concurrent executions padrão:",
+                        options: ["100", "500", "1000", "Unlimited"],
+                        correct: 2,
+                        explanation: "Limite padrão é 1000 concurrent executions por região."
+                    },
+                    {
+                        question: "EventBridge é sucessor de:",
+                        options: ["SNS", "SQS", "CloudWatch Events", "Kinesis"],
+                        correct: 2,
+                        explanation: "EventBridge é a evolução do CloudWatch Events."
+                    },
+                    {
+                        question: "Para deployment canary no Lambda:",
+                        options: ["Blue/Green", "CodeDeploy", "Rolling", "All-at-once"],
+                        correct: 1,
+                        explanation: "CodeDeploy oferece deployment canary para Lambda functions."
+                    }
+                ],
+                '5-6': [
+                    {
+                        question: "ECS vs EKS principal diferença:",
+                        options: ["ECS é mais caro", "EKS usa Kubernetes", "ECS não tem auto-scaling", "EKS é mais simples"],
+                        correct: 1,
+                        explanation: "EKS é managed Kubernetes, ECS é container orchestration nativo da AWS."
+                    },
+                    {
+                        question: "Fargate elimina a necessidade de:",
+                        options: ["Task definitions", "Load balancers", "Gerenciar EC2 instances", "Container images"],
+                        correct: 2,
+                        explanation: "Fargate é serverless - você não gerencia a infraestrutura EC2 subjacente."
+                    },
+                    {
+                        question: "Task Definition especifica:",
+                        options: ["Apenas CPU", "Apenas memória", "CPU, memória e configurações", "Apenas networking"],
+                        correct: 2,
+                        explanation: "Task Definition é o blueprint que especifica CPU, memória, portas, variáveis, etc."
+                    },
+                    {
+                        question: "Beanstalk Blue/Green deployment:",
+                        options: ["Não suportado", "Manual apenas", "Automático com swap", "Requer downtime"],
+                        correct: 2,
+                        explanation: "Beanstalk suporta Blue/Green com swap automático de environments."
+                    },
+                    {
+                        question: "Para otimizar Docker builds:",
+                        options: ["Single-stage builds", "Multi-stage builds", "Mais layers", "Sem cache"],
+                        correct: 1,
+                        explanation: "Multi-stage builds reduzem tamanho da imagem final eliminando dependências de build."
+                    },
+                    {
+                        question: "ECS Service auto-scaling baseia-se em:",
+                        options: ["CPU apenas", "Memory apenas", "CloudWatch metrics", "Manual apenas"],
+                        correct: 2,
+                        explanation: "ECS Service auto-scaling usa CloudWatch metrics como CPU, memory, custom metrics."
+                    },
+                    {
+                        question: "Beanstalk configuration files ficam em:",
+                        options: [".ebextensions/", ".aws/", ".config/", ".beanstalk/"],
+                        correct: 0,
+                        explanation: ".ebextensions/ contém arquivos .config para customizar o environment."
+                    },
+                    {
+                        question: "Para persistent storage em containers:",
+                        options: ["Instance storage", "EFS ou EBS", "S3 apenas", "Não é possível"],
+                        correct: 1,
+                        explanation: "EFS para shared storage, EBS para single-instance persistent storage."
+                    },
+                    {
+                        question: "ECS Cluster pode usar:",
+                        options: ["Apenas EC2", "Apenas Fargate", "EC2 e Fargate", "Apenas containers"],
+                        correct: 2,
+                        explanation: "ECS Cluster pode misturar EC2 e Fargate launch types no mesmo cluster."
+                    },
+                    {
+                        question: "Para secrets em containers:",
+                        options: ["Environment variables", "Secrets Manager/Parameter Store", "Hardcoded", "Config files"],
+                        correct: 1,
+                        explanation: "Use Secrets Manager ou Parameter Store para injetar secrets de forma segura."
+                    }
+                ],
+                '7': [
+                    {
+                        question: "Quantas AZs mínimas por região AWS?",
+                        options: ["2", "3", "4", "5"],
+                        correct: 1,
+                        explanation: "Cada região AWS tem no mínimo 3 Availability Zones."
+                    },
+                    {
+                        question: "Lambda timeout máximo:",
+                        options: ["5 min", "10 min", "15 min", "30 min"],
+                        correct: 2,
+                        explanation: "Lambda tem timeout máximo de 15 minutos."
+                    },
+                    {
+                        question: "Para eliminar Lambda cold starts:",
+                        options: ["Mais memory", "Provisioned Concurrency", "Containers", "Menos código"],
+                        correct: 1,
+                        explanation: "Provisioned Concurrency mantém funções warm eliminando cold starts."
+                    },
+                    {
+                        question: "ECS Fargate elimina:",
+                        options: ["Task definitions", "Gerenciar EC2", "Load balancers", "Auto-scaling"],
+                        correct: 1,
+                        explanation: "Fargate é serverless - elimina necessidade de gerenciar EC2 instances."
+                    },
+                    {
+                        question: "IAM Explicit Deny vs Allow:",
+                        options: ["Allow prevalece", "Deny prevalece", "Depende da ordem", "São iguais"],
+                        correct: 1,
+                        explanation: "Explicit Deny sempre prevalece sobre Allow em políticas IAM."
+                    },
+                    {
+                        question: "API Gateway payload máximo:",
+                        options: ["1MB", "6MB", "10MB", "256KB"],
+                        correct: 1,
+                        explanation: "API Gateway suporta até 6MB de payload para requests síncronos."
+                    },
+                    {
+                        question: "Security Groups são:",
+                        options: ["Stateless", "Stateful", "Ambos", "Nenhum"],
+                        correct: 1,
+                        explanation: "Security Groups são stateful - return traffic é automaticamente permitido."
+                    },
+                    {
+                        question: "Beanstalk deployment com zero downtime:",
+                        options: ["All-at-once", "Rolling", "Blue/Green", "Immutable"],
+                        correct: 2,
+                        explanation: "Blue/Green deployment oferece zero downtime com swap de environments."
+                    },
+                    {
+                        question: "Step Functions Parallel state:",
+                        options: ["Execução sequencial", "Execução paralela", "Loops", "Condições"],
+                        correct: 1,
+                        explanation: "Parallel state executa múltiplos branches simultaneamente."
+                    },
+                    {
+                        question: "Para alta disponibilidade NAT Gateway:",
+                        options: ["Um por VPC", "Um por AZ", "Um por subnet", "Não necessário"],
+                        correct: 1,
+                        explanation: "Para alta disponibilidade, deve-se ter um NAT Gateway por AZ."
+                    }
+                ],
+                '8-9': [
+                    {
+                        question: "S3 Standard oferece quantos 9s de durabilidade?",
+                        options: ["9 noves", "11 noves", "99%", "99.9%"],
+                        correct: 1,
+                        explanation: "S3 Standard oferece 99.999999999% (11 noves) de durabilidade."
+                    },
+                    {
+                        question: "Para otimizar custos S3 automaticamente:",
+                        options: ["Versioning", "Lifecycle policies", "CRR", "Encryption"],
+                        correct: 1,
+                        explanation: "Lifecycle policies movem objetos automaticamente para classes mais baratas."
+                    },
+                    {
+                        question: "DynamoDB eventual consistency se aplica a:",
+                        options: ["Writes", "Strongly consistent reads", "Eventually consistent reads", "Scans"],
+                        correct: 2,
+                        explanation: "Eventually consistent reads podem não refletir writes recentes imediatamente."
+                    },
+                    {
+                        question: "RDS Multi-AZ oferece:",
+                        options: ["Read scaling", "Write scaling", "High availability", "Backup apenas"],
+                        correct: 2,
+                        explanation: "Multi-AZ oferece alta disponibilidade com failover automático."
+                    },
+                    {
+                        question: "Para read scaling no RDS:",
+                        options: ["Multi-AZ", "Read Replicas", "Bigger instance", "Sharding"],
+                        correct: 1,
+                        explanation: "Read Replicas distribuem carga de leitura para múltiplas instâncias."
+                    },
+                    {
+                        question: "ElastiCache Redis vs Memcached:",
+                        options: ["Redis é mais simples", "Memcached tem persistência", "Redis tem mais features", "São idênticos"],
+                        correct: 2,
+                        explanation: "Redis oferece persistência, replicação, clustering e pub/sub."
+                    },
+                    {
+                        question: "DynamoDB hot partition é causada por:",
+                        options: ["Muitos dados", "Partition key mal distribuída", "Falta de GSI", "Pouca memória"],
+                        correct: 1,
+                        explanation: "Partition key deve distribuir uniformemente os dados entre partições."
+                    },
+                    {
+                        question: "S3 Cross-Region Replication requer:",
+                        options: ["Versioning habilitado", "Encryption", "Lifecycle", "Public access"],
+                        correct: 0,
+                        explanation: "CRR requer versioning habilitado no bucket source e destination."
+                    },
+                    {
+                        question: "Para backup cross-region automatizado:",
+                        options: ["Manual snapshots", "AWS Backup", "Scripts customizados", "Não é possível"],
+                        correct: 1,
+                        explanation: "AWS Backup oferece backup automatizado cross-region para múltiplos serviços."
+                    },
+                    {
+                        question: "DynamoDB Streams capturam:",
+                        options: ["Apenas inserts", "Apenas updates", "Apenas deletes", "Todas as mudanças"],
+                        correct: 3,
+                        explanation: "DynamoDB Streams capturam todas as mudanças (insert, update, delete)."
+                    }
+                ],
+                '10-11': [
+                    {
+                        question: "API Gateway cache TTL máximo:",
+                        options: ["300 segundos", "3600 segundos", "86400 segundos", "Unlimited"],
+                        correct: 1,
+                        explanation: "API Gateway cache TTL máximo é 3600 segundos (1 hora)."
+                    },
+                    {
+                        question: "SQS FIFO garante:",
+                        options: ["Alta performance", "Ordem das mensagens", "Baixo custo", "Durabilidade"],
+                        correct: 1,
+                        explanation: "SQS FIFO garante ordem das mensagens e exactly-once processing."
+                    },
+                    {
+                        question: "SNS Fan-out pattern permite:",
+                        options: ["Uma mensagem para um subscriber", "Uma mensagem para múltiplos subscribers", "Múltiplas mensagens para um", "Nenhuma das anteriores"],
+                        correct: 1,
+                        explanation: "Fan-out envia uma mensagem para múltiplos subscribers simultaneamente."
+                    },
+                    {
+                        question: "EventBridge é sucessor de:",
+                        options: ["SNS", "SQS", "CloudWatch Events", "Kinesis"],
+                        correct: 2,
+                        explanation: "EventBridge é a evolução do CloudWatch Events com mais funcionalidades."
+                    },
+                    {
+                        question: "Para filtrar mensagens SNS:",
+                        options: ["Lambda function", "Filter policies", "SQS filter", "Manual processing"],
+                        correct: 1,
+                        explanation: "SNS filter policies permitem filtrar mensagens por atributos."
+                    },
+                    {
+                        question: "SQS visibility timeout serve para:",
+                        options: ["Deletar mensagens", "Evitar processamento duplo", "Ordenar mensagens", "Criptografar"],
+                        correct: 1,
+                        explanation: "Visibility timeout esconde mensagem temporariamente para evitar processamento duplo."
+                    },
+                    {
+                        question: "API Gateway REST vs HTTP API:",
+                        options: ["REST é mais rápido", "HTTP é mais barato", "São idênticos", "REST tem mais features"],
+                        correct: 1,
+                        explanation: "HTTP API é mais barato e rápido, REST API tem mais features."
+                    },
+                    {
+                        question: "EventBridge custom event bus permite:",
+                        options: ["Apenas eventos AWS", "Eventos de aplicação customizada", "Apenas eventos de parceiros", "Nenhum evento"],
+                        correct: 1,
+                        explanation: "Custom event bus permite eventos de aplicações customizadas."
+                    },
+                    {
+                        question: "Para throttling por usuário no API Gateway:",
+                        options: ["Lambda Authorizer", "Usage Plans + API Keys", "WAF", "CloudFront"],
+                        correct: 1,
+                        explanation: "Usage Plans com API Keys implementam throttling granular por usuário."
+                    },
+                    {
+                        question: "SQS Dead Letter Queue é usado para:",
+                        options: ["Performance", "Mensagens que falharam múltiplas vezes", "Ordenação", "Backup"],
+                        correct: 1,
+                        explanation: "DLQ recebe mensagens que falharam após esgotar tentativas de retry."
+                    }
+                ],
+                '12-13': [
+                    {
+                        question: "CodePipeline stages executam:",
+                        options: ["Paralelo sempre", "Sequencial sempre", "Sequencial por padrão", "Aleatório"],
+                        correct: 2,
+                        explanation: "Stages executam sequencialmente, mas actions dentro de um stage podem ser paralelas."
+                    },
+                    {
+                        question: "CloudWatch custom metrics usam:",
+                        options: ["PutMetricData API", "Logs automaticamente", "X-Ray", "CloudTrail"],
+                        correct: 0,
+                        explanation: "PutMetricData API é usado para enviar métricas customizadas."
+                    },
+                    {
+                        question: "X-Ray segments representam:",
+                        options: ["Erros", "Chamadas de serviço", "Logs", "Métricas"],
+                        correct: 1,
+                        explanation: "Segments representam chamadas para serviços AWS, APIs ou databases."
+                    },
+                    {
+                        question: "Para rollback automático no CodeDeploy:",
+                        options: ["Manual apenas", "CloudWatch Alarms", "Não é possível", "Sempre automático"],
+                        correct: 1,
+                        explanation: "CloudWatch Alarms podem triggerar rollback automático no CodeDeploy."
+                    },
+                    {
+                        question: "IAM policy condition por IP:",
+                        options: ["IpAddress", "SourceIp", "aws:SourceIp", "ClientIp"],
+                        correct: 2,
+                        explanation: "aws:SourceIp é a condition key para restringir por endereço IP."
+                    },
+                    {
+                        question: "CodeBuild executa em:",
+                        options: ["EC2 instances", "Lambda", "Docker containers", "ECS"],
+                        correct: 2,
+                        explanation: "CodeBuild executa builds em containers Docker gerenciados."
+                    },
+                    {
+                        question: "Para deployment canary no Lambda:",
+                        options: ["Manual", "CodeDeploy", "CloudFormation", "SAM"],
+                        correct: 1,
+                        explanation: "CodeDeploy oferece deployment canary automático para Lambda."
+                    },
+                    {
+                        question: "X-Ray annotations vs metadata:",
+                        options: ["Annotations são indexadas", "Metadata são indexadas", "São idênticos", "Não há diferença"],
+                        correct: 0,
+                        explanation: "Annotations são indexadas e podem ser usadas para filtros e busca."
+                    },
+                    {
+                        question: "CloudWatch Logs retention máximo:",
+                        options: ["1 ano", "5 anos", "10 anos", "Indefinido"],
+                        correct: 3,
+                        explanation: "CloudWatch Logs podem ter retenção indefinida (never expire)."
+                    },
+                    {
+                        question: "Para secrets rotation automática:",
+                        options: ["Parameter Store", "Secrets Manager", "IAM", "KMS"],
+                        correct: 1,
+                        explanation: "Secrets Manager oferece rotação automática de secrets."
+                    }
+                ]
+            };
+            
+            return questoesPorModulo[modulo] || [];
+        }
+        
+        function executarQuiz(questoes, titulo) {
+            if (questoes.length === 0) {
+                alert('Quiz não disponível para este módulo.');
+                return;
+            }
+            
+            let questaoAtual = 0;
+            let pontuacao = 0;
+            
+            const modal = document.createElement('div');
+            modal.className = 'quiz-modal';
+            modal.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(0,0,0,0.9); display: flex; justify-content: center;
+                align-items: center; z-index: 3000;
+            `;
+            
+            function mostrarQuestao() {
+                const questao = questoes[questaoAtual];
+                modal.innerHTML = `
+                    <div style="background: white; border-radius: 15px; max-width: 700px; width: 90%; padding: 2rem;">
+                        <div style="background: linear-gradient(135deg, #232f3e, #ff9900); color: white; padding: 1.5rem; border-radius: 10px; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h3>${titulo}</h3>
+                                <p>Questão ${questaoAtual + 1} de ${questoes.length}</p>
+                            </div>
+                            <button onclick="fecharQuiz()" style="background: none; border: none; color: white; font-size: 2rem; cursor: pointer; padding: 0.5rem;">&times;</button>
+                        </div>
+                        <h4 style="margin-bottom: 2rem; color: #232f3e;">${questao.question}</h4>
+                        <div style="margin-bottom: 2rem;">
+                            ${questao.options.map((opcao, i) => `
+                                <label style="display: block; background: #f8f9fa; margin: 1rem 0; padding: 1rem; border-radius: 8px; cursor: pointer; border: 2px solid #e9ecef;" 
+                                       onmouseover="this.style.borderColor='#ff9900'" onmouseout="this.style.borderColor='#e9ecef'">
+                                    <input type="radio" name="resposta" value="${i}" style="margin-right: 1rem;">
+                                    ${opcao}
+                                </label>
+                            `).join('')}
+                        </div>
+                        <div style="text-align: center;">
+                            <button onclick="proximaQuestaoQuiz()" style="background: linear-gradient(135deg, #ff9900, #ff6600); color: white; border: none; padding: 1rem 2rem; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                                ${questaoAtual === questoes.length - 1 ? 'Finalizar' : 'Próxima'}
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            window.fecharQuiz = function() {
+                modal.remove();
+            };
+            
+            window.proximaQuestaoQuiz = function() {
+                const selecionada = modal.querySelector('input[name="resposta"]:checked');
+                if (!selecionada) {
+                    alert('Selecione uma resposta!');
+                    return;
+                }
+                
+                if (parseInt(selecionada.value) === questoes[questaoAtual].correct) {
+                    pontuacao++;
+                }
+                
+                questaoAtual++;
+                
+                if (questaoAtual < questoes.length) {
+                    mostrarQuestao();
+                } else {
+                    mostrarResultado();
+                }
+            };
+            
+            function mostrarResultado() {
+                const percentual = Math.round((pontuacao / questoes.length) * 100);
+                const passou = percentual >= 70;
+                
+                // Marcar quiz como completo sempre que for feito
+                marcarQuizCompleto(titulo.replace('Módulo ', ''));
+                
+                modal.innerHTML = `
+                    <div style="background: white; border-radius: 15px; max-width: 600px; width: 90%; padding: 3rem; text-align: center;">
+                        <h2>Resultado do Quiz</h2>
+                        <div style="font-size: 4rem; font-weight: bold; margin: 2rem 0; color: ${passou ? '#28a745' : '#dc3545'};">
+                            ${percentual}%
+                        </div>
+                        <h3>${passou ? '🎉 Parabéns! Você passou!' : '📚 Continue estudando!'}</h3>
+                        <p>${pontuacao} de ${questoes.length} questões corretas</p>
+                        <div style="margin-top: 2rem;">
+                            <button onclick="modal.remove()" style="background: linear-gradient(135deg, #ff9900, #ff6600); color: white; border: none; padding: 1rem 2rem; border-radius: 8px; font-weight: 600; cursor: pointer; margin-right: 1rem;">
+                                Fechar
+                            </button>
+                            <button onclick="location.reload()" style="background: #6c757d; color: white; border: none; padding: 1rem 2rem; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                                Refazer
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            document.body.appendChild(modal);
+            mostrarQuestao();
+        }
+
+        function startMiniExam(semana) {
+            // Iniciar mini simulado da semana
+            if (semana === 'semana1') {
+                startSimulado('mini-semana1', 25);
+            } else if (semana === 'semana2') {
+                startSimulado('mini-semana2', 25);
+            }
+        }
+
+        function startFinalExam() {
+            // Iniciar simulado final de 65 questões
+            startSimulado('final', 65);
+        }
+
+        function startLevelExam(nivel) {
+            // Iniciar simulado por nível
+            startSimulado(nivel, 65);
+        }
+
+        function startSimulado(tipo, numQuestoes) {
+            // Implementação do sistema de simulado
+            alert(`Iniciando simulado ${tipo} com ${numQuestoes} questões. Sistema de simulado será implementado.`);
+        }
+
+        function startModuleQuiz(moduleId) {
+            // Implementação do quiz do módulo
+            alert(`Iniciando quiz do módulo ${moduleId}. Sistema de quiz será implementado.`);
+        }
+
+        // Controle de progresso real baseado em quizzes completados
+        function updateProgress() {
+            const completedQuizzes = JSON.parse(localStorage.getItem('completedQuizzes') || '[]');
+            const totalQuizzes = 7; // Total de módulos com quiz
+            const progress = Math.round((completedQuizzes.length / totalQuizzes) * 100);
+            
+            document.getElementById('overallProgress').style.width = progress + '%';
+            document.getElementById('progressText').textContent = progress + '% Concluído';
+            document.getElementById('daysCompleted').textContent = completedQuizzes.length;
+        }
+        
+        function marcarQuizCompleto(modulo) {
+            const completedQuizzes = JSON.parse(localStorage.getItem('completedQuizzes') || '[]');
+            if (!completedQuizzes.includes(modulo)) {
+                completedQuizzes.push(modulo);
+                localStorage.setItem('completedQuizzes', JSON.stringify(completedQuizzes));
+            }
+            updateProgress();
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            updateProgress();
+        });
+    </script>
+</body>
+</html>

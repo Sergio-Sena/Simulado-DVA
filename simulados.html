@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulados DVA-C02</title>
+    <link rel="stylesheet" href="styles-final.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1><i class="fab fa-aws"></i> Simulados DVA-C02</h1>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Início</a></li>
+                    <li><a href="curso-completo.html">Curso</a></li>
+                    <li><a href="laboratorios.html">Laboratórios</a></li>
+                    <li><a href="simulados.html" class="active">Simulados</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main style="margin-top: 100px;">
+        <section class="hero" style="padding: 80px 0;">
+            <div class="container">
+                <h2>🎯 Simulados DVA-C02</h2>
+                <p>Pratique com simulados no formato real da prova</p>
+            </div>
+        </section>
+
+        <section id="simulados" class="section">
+            <div class="container">
+                <h2>📊 Níveis de Simulado</h2>
+                <p style="text-align: center; margin-bottom: 3rem;">
+                    Cada simulado contém 65 questões com a mesma distribuição do exame oficial
+                </p>
+                
+                <div class="quiz-container" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; max-width: 1200px; margin: 0 auto;">
+                    <div class="quiz-card nivel-basico">
+                        <div class="nivel-header">
+                            <i class="fas fa-seedling"></i>
+                            <h3>Nível Básico</h3>
+                        </div>
+                        <div class="nivel-info">
+                            <p><strong>65 questões</strong></p>
+                            <p>Conceitos fundamentais</p>
+                            <p>Aprovação: <strong>72%</strong></p>
+                        </div>
+                        <div class="distribuicao">
+                            <h4>Distribuição:</h4>
+                            <ul>
+                                <li>Development: 32% (21 questões)</li>
+                                <li>Security: 26% (17 questões)</li>
+                                <li>Deployment: 24% (16 questões)</li>
+                                <li>Troubleshooting: 18% (11 questões)</li>
+                            </ul>
+                        </div>
+                        <button class="btn-primary" onclick="iniciarSimulado('basico')" style="background: linear-gradient(135deg, #28a745, #20c997);">
+                            <i class="fas fa-play"></i> Iniciar Básico
+                        </button>
+                    </div>
+
+                    <div class="quiz-card nivel-intermediario">
+                        <div class="nivel-header">
+                            <i class="fas fa-chart-line"></i>
+                            <h3>Nível Intermediário</h3>
+                        </div>
+                        <div class="nivel-info">
+                            <p><strong>65 questões</strong></p>
+                            <p>Cenários práticos</p>
+                            <p>Aprovação: <strong>75%</strong></p>
+                        </div>
+                        <div class="distribuicao">
+                            <h4>Distribuição:</h4>
+                            <ul>
+                                <li>Development: 32% (21 questões)</li>
+                                <li>Security: 26% (17 questões)</li>
+                                <li>Deployment: 24% (16 questões)</li>
+                                <li>Troubleshooting: 18% (11 questões)</li>
+                            </ul>
+                        </div>
+                        <button class="btn-primary" onclick="iniciarSimulado('intermediario')">
+                            <i class="fas fa-play"></i> Iniciar Intermediário
+                        </button>
+                    </div>
+
+                    <div class="quiz-card nivel-avancado">
+                        <div class="nivel-header">
+                            <i class="fas fa-rocket"></i>
+                            <h3>Nível Avançado</h3>
+                        </div>
+                        <div class="nivel-info">
+                            <p><strong>65 questões</strong></p>
+                            <p>Casos complexos</p>
+                            <p>Aprovação: <strong>80%</strong></p>
+                        </div>
+                        <div class="distribuicao">
+                            <h4>Distribuição:</h4>
+                            <ul>
+                                <li>Development: 32% (21 questões)</li>
+                                <li>Security: 26% (17 questões)</li>
+                                <li>Deployment: 24% (16 questões)</li>
+                                <li>Troubleshooting: 18% (11 questões)</li>
+                            </ul>
+                        </div>
+                        <button class="btn-primary" onclick="iniciarSimulado('avancado')" style="background: linear-gradient(135deg, #dc3545, #c82333);">
+                            <i class="fas fa-play"></i> Iniciar Avançado
+                        </button>
+                    </div>
+                </div>
+
+                <div class="simulado-info">
+                    <h3>ℹ️ Informações dos Simulados</h3>
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <h4>⏱️ Tempo</h4>
+                            <p>130 minutos (2h 10min)</p>
+                            <p>Mesmo tempo da prova real</p>
+                        </div>
+                        <div class="info-card">
+                            <h4>📝 Formato</h4>
+                            <p>65 questões múltipla escolha</p>
+                            <p>4 alternativas por questão</p>
+                        </div>
+                        <div class="info-card">
+                            <h4>📊 Pontuação</h4>
+                            <p>Mínimo varia por nível</p>
+                            <p>Resultado detalhado por domínio</p>
+                        </div>
+                        <div class="info-card">
+                            <h4>🔄 Repetição</h4>
+                            <p>Questões aleatórias</p>
+                            <p>Pode refazer quantas vezes quiser</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" style="background: white;">
+            <div class="container">
+                <h2>📈 Histórico de Simulados</h2>
+                <div id="historico-simulados">
+                    <p style="text-align: center; color: #666;">
+                        Nenhum simulado realizado ainda. Faça seu primeiro simulado!
+                    </p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 AWS DVA-C02 Simulados. Baseado na documentação oficial da AWS.</p>
+        </div>
+    </footer>
+
+    <script src="banco-questoes.js"></script>
+    <script>
+        function iniciarSimulado(nivel) {
+            // Usar a função do banco-questoes.js para gerar simulado com distribuição correta
+            const questoesSimulado = gerarSimulado(nivel, 65);
+            
+            // Salvar simulado na sessão
+            sessionStorage.setItem('simulado-atual', JSON.stringify({
+                nivel: nivel,
+                questoes: questoesSimulado,
+                inicioTempo: Date.now()
+            }));
+            
+            // Redirecionar para página do simulado
+            window.location.href = 'simulado-execucao.html';
+        }
+        
+        function embaralharArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+        
+        function obterTodasQuestoes() {
+            // Retorna todas as questões do banco combinando todos os domínios
+            const todasQuestoes = [];
+            Object.values(bancoQuestoes).forEach(dominio => {
+                todasQuestoes.push(...dominio);
+            });
+            return todasQuestoes;
+        }
+
+        // Carregar histórico de simulados
+        function carregarHistorico() {
+            const historico = JSON.parse(localStorage.getItem('historico-simulados') || '[]');
+            const container = document.getElementById('historico-simulados');
+            
+            if (historico.length === 0) {
+                return;
+            }
+            
+            container.innerHTML = historico.map(simulado => `
+                <div class="historico-item">
+                    <div class="historico-info">
+                        <h4>Nível ${simulado.nivel}</h4>
+                        <p>Data: ${new Date(simulado.data).toLocaleDateString()}</p>
+                        <p>Pontuação: ${simulado.pontuacao}%</p>
+                        <p>Status: ${simulado.pontuacao >= 72 ? '✅ Aprovado' : '❌ Reprovado'}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Inicializar página
+        document.addEventListener('DOMContentLoaded', function() {
+            carregarHistorico();
+        });
+    </script>
+
+    <style>
+        .nivel-basico { 
+            border-left: 4px solid #28a745;
+            background: linear-gradient(135deg, #f8fff9, #e8f5e8);
+        }
+        .nivel-intermediario { 
+            border-left: 4px solid #ff9900;
+            background: linear-gradient(135deg, #fff8f0, #ffeaa7);
+        }
+        .nivel-avancado { 
+            border-left: 4px solid #dc3545;
+            background: linear-gradient(135deg, #fff8f8, #f5e8e8);
+        }
+        
+        .nivel-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .nivel-basico .nivel-header i { color: #28a745; }
+        .nivel-intermediario .nivel-header i { color: #ff9900; }
+        .nivel-avancado .nivel-header i { color: #dc3545; }
+        
+        .nivel-header i {
+            font-size: 2rem;
+        }
+        
+        .nivel-info {
+            margin-bottom: 1.5rem;
+        }
+        
+        .nivel-info p {
+            margin: 0.5rem 0;
+        }
+        
+        .distribuicao {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .distribuicao h4 {
+            margin-bottom: 0.5rem;
+            color: #232f3e;
+        }
+        
+        .distribuicao ul {
+            margin: 0;
+            padding-left: 1.5rem;
+        }
+        
+        .distribuicao li {
+            margin: 0.3rem 0;
+            font-size: 0.9rem;
+        }
+        
+        .simulado-info {
+            margin-top: 4rem;
+            text-align: center;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .info-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .info-card h4 {
+            color: #232f3e;
+            margin-bottom: 1rem;
+        }
+        
+        .historico-item {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 1rem;
+        }
+        
+        @media (max-width: 1024px) {
+            .quiz-container {
+                grid-template-columns: 1fr !important;
+                max-width: 400px !important;
+            }
+        }
+    </style>
+</body>
+</html>

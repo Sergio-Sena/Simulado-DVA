@@ -1,0 +1,199 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: 'DVA-C02 - Lambda com S3 Trigger e DLQ'
+
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 512
+    Runtime: python3.9
+    Environment:
+      Variables:
+        LOG_LEVEL: INFO
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues: [dev, staging, prod]
+    Description: Environment name
+
+Resources:
+  # S3 Bucket para uploads
+  UploadBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'dva-uploads-${Environment}-${AWS::AccountId}'
+      VersioningConfiguration:
+        Status: Enabled
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Event: s3:ObjectCreated:*
+            Function: !GetAtt ProcessImageFunction.Arn
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: prefix
+                    Value: uploads/
+                  - Name: suffix
+                    Value: .jpg
+
+  # S3 Bucket para arquivos processados
+  ProcessedBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'dva-uploads-${Environment}-${AWS::AccountId}-processed'
+      VersioningConfiguration:
+        Status: Enabled
+
+  # DynamoDB Table para metadados
+  FileMetadataTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub 'dva-file-metadata-${Environment}'
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: file_key
+          AttributeType: S
+        - AttributeName: upload_time
+          AttributeType: S
+      KeySchema:
+        - AttributeName: file_key
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: upload-time-index
+          KeySchema:
+            - AttributeName: upload_time
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+
+  # SQS Dead Letter Queue
+  ProcessingDLQ:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub 'dva-processing-dlq-${Environment}'
+      MessageRetentionPeriod: 1209600  # 14 dias
+      VisibilityTimeoutSeconds: 60
+
+  # Lambda Function
+  ProcessImageFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub 'dva-process-image-${Environment}'
+      CodeUri: ./
+      Handler: dia3-lambda-s3.lambda_handler
+      Description: 'Processa uploads de imagem do S3'
+      
+      # Configurações de performance
+      ReservedConcurrencyLimit: 10
+      DeadLetterQueue:
+        Type: SQS
+        TargetArn: !GetAtt ProcessingDLQ.Arn
+      
+      # Políticas IAM
+      Policies:
+        - S3ReadPolicy:
+            BucketName: !Ref UploadBucket
+        - S3WritePolicy:
+            BucketName: !Ref ProcessedBucket
+        - DynamoDBWritePolicy:
+            TableName: !Ref FileMetadataTable
+        - SQSSendMessagePolicy:
+            QueueName: !GetAtt ProcessingDLQ.QueueName
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - logs:CreateLogGroup
+                - logs:CreateLogStream
+                - logs:PutLogEvents
+              Resource: '*'
+      
+      # Event Sources
+      Events:
+        S3Upload:
+          Type: S3
+          Properties:
+            Bucket: !Ref UploadBucket
+            Events: s3:ObjectCreated:*
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: prefix
+                    Value: uploads/
+
+  # Lambda Layer para dependências
+  ImageProcessingLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: !Sub 'dva-image-processing-${Environment}'
+      Description: 'Bibliotecas para processamento de imagem'
+      ContentUri: ./layers/image-processing/
+      CompatibleRuntimes:
+        - python3.9
+        - python3.8
+      RetentionPolicy: Delete
+
+  # CloudWatch Alarms
+  LambdaErrorAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub 'dva-lambda-errors-${Environment}'
+      AlarmDescription: 'Lambda function errors'
+      MetricName: Errors
+      Namespace: AWS/Lambda
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 2
+      Threshold: 5
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref ProcessImageFunction
+
+  DLQMessageAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub 'dva-dlq-messages-${Environment}'
+      AlarmDescription: 'Messages in DLQ'
+      MetricName: ApproximateNumberOfVisibleMessages
+      Namespace: AWS/SQS
+      Statistic: Average
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 1
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      Dimensions:
+        - Name: QueueName
+          Value: !GetAtt ProcessingDLQ.QueueName
+
+Outputs:
+  UploadBucketName:
+    Description: 'Nome do bucket para uploads'
+    Value: !Ref UploadBucket
+    Export:
+      Name: !Sub '${AWS::StackName}-UploadBucket'
+
+  ProcessedBucketName:
+    Description: 'Nome do bucket para arquivos processados'
+    Value: !Ref ProcessedBucket
+
+  LambdaFunctionArn:
+    Description: 'ARN da função Lambda'
+    Value: !GetAtt ProcessImageFunction.Arn
+
+  DynamoDBTableName:
+    Description: 'Nome da tabela DynamoDB'
+    Value: !Ref FileMetadataTable
+
+  DLQUrl:
+    Description: 'URL da Dead Letter Queue'
+    Value: !Ref ProcessingDLQ

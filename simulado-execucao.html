@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Executando Simulado DVA-C02</title>
+    <link rel="stylesheet" href="styles-final.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .simulado-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .simulado-header {
+            background: linear-gradient(135deg, #232f3e, #ff9900);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 8px 25px rgba(35, 47, 62, 0.3);
+        }
+        
+        .timer {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .progress-info {
+            text-align: center;
+        }
+        
+        .questao-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .questao-numero {
+            color: #ff9900;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        
+        .questao-texto {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            color: #232f3e;
+        }
+        
+        .opcoes-container {
+            margin-bottom: 2rem;
+        }
+        
+        .opcao {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+        }
+        
+        .opcao:hover {
+            border-color: #ff9900;
+            background: #fff8f0;
+        }
+        
+        .opcao.selecionada {
+            border-color: #ff9900;
+            background: #fff8f0;
+        }
+        
+        .opcao input {
+            margin-right: 1rem;
+        }
+        
+        .navegacao {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .btn-nav {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-anterior {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-proximo {
+            background: linear-gradient(135deg, #ff9900, #ff6600);
+            color: white;
+        }
+        
+        .btn-finalizar {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+        }
+        
+        .questoes-navegacao {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+        
+        .questao-nav {
+            width: 45px;
+            height: 45px;
+            border: 2px solid #e9ecef;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            background: white;
+        }
+        
+        .questao-nav:hover {
+            transform: scale(1.1);
+            border-color: #ff9900;
+            box-shadow: 0 4px 12px rgba(255, 153, 0, 0.3);
+        }
+        
+        .questao-nav.atual {
+            border-color: #ff9900;
+            background: #ff9900;
+            color: white;
+        }
+        
+        .questao-nav.respondida {
+            border-color: #28a745;
+            background: #28a745;
+            color: white;
+        }
+        
+        .resultado-container {
+            background: white;
+            padding: 3rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .resultado-score {
+            font-size: 4rem;
+            font-weight: bold;
+            margin: 2rem 0;
+        }
+        
+        .resultado-score.aprovado {
+            color: #28a745;
+        }
+        
+        .resultado-score.reprovado {
+            color: #dc3545;
+        }
+        
+        .resultado-detalhes {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .detalhe-dominio {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="simulado-container">
+        <div class="simulado-header">
+            <div>
+                <h2 id="titulo-simulado">Simulado DVA-C02</h2>
+                <p id="info-simulado">65 questões • 130 minutos</p>
+            </div>
+            <div class="progress-info">
+                <div class="timer" id="timer">130:00</div>
+                <div>Questão <span id="questao-atual">1</span> de <span id="total-questoes">65</span></div>
+            </div>
+            <div>
+                <button onclick="voltarInicio()" style="background: linear-gradient(135deg, #dc3545, #c82333); color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 25px; cursor: pointer; font-weight: 600; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(220, 53, 69, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(220, 53, 69, 0.3)'">
+                    <i class="fas fa-home"></i> Sair do Simulado
+                </button>
+            </div>
+        </div>
+
+        <div id="simulado-content">
+            <!-- Navegação por questões -->
+            <div class="questoes-navegacao" id="questoes-nav"></div>
+            
+            <!-- Container da questão atual -->
+            <div class="questao-container" id="questao-container">
+                <!-- Conteúdo será preenchido dinamicamente -->
+            </div>
+            
+            <!-- Navegação -->
+            <div class="navegacao">
+                <button class="btn-nav btn-anterior" id="btn-anterior" onclick="questaoAnterior()">
+                    <i class="fas fa-chevron-left"></i> Anterior
+                </button>
+                
+                <button class="btn-nav btn-proximo" id="btn-proximo" onclick="proximaQuestao()">
+                    Próxima <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Container do resultado (inicialmente oculto) -->
+        <div id="resultado-container" class="resultado-container" style="display: none;">
+            <!-- Resultado será preenchido após finalização -->
+        </div>
+    </div>
+
+    <script src="banco-questoes.js"></script>
+    <script>
+        let simuladoAtual = null;
+        let questaoAtualIndex = 0;
+        let respostas = {};
+        let tempoInicio = null;
+        let timerInterval = null;
+
+        // Inicializar simulado
+        document.addEventListener('DOMContentLoaded', function() {
+            const dadosSimulado = sessionStorage.getItem('simulado-atual');
+            
+            if (!dadosSimulado) {
+                alert('Nenhum simulado encontrado. Redirecionando...');
+                window.location.href = 'simulados.html';
+                return;
+            }
+            
+            simuladoAtual = JSON.parse(dadosSimulado);
+            tempoInicio = simuladoAtual.inicioTempo;
+            
+            inicializarSimulado();
+            iniciarTimer();
+            mostrarQuestao(0);
+        });
+
+        function inicializarSimulado() {
+            document.getElementById('titulo-simulado').textContent = `Simulado ${simuladoAtual.nivel.charAt(0).toUpperCase() + simuladoAtual.nivel.slice(1)}`;
+            document.getElementById('total-questoes').textContent = simuladoAtual.questoes.length;
+            
+            // Criar navegação por questões
+            const navContainer = document.getElementById('questoes-nav');
+            navContainer.innerHTML = simuladoAtual.questoes.map((_, index) => 
+                `<div class="questao-nav" onclick="irParaQuestao(${index})">${index + 1}</div>`
+            ).join('');
+        }
+
+        function iniciarTimer() {
+            const tempoLimite = 130 * 60 * 1000; // 130 minutos em ms
+            
+            timerInterval = setInterval(() => {
+                const tempoDecorrido = Date.now() - tempoInicio;
+                const tempoRestante = tempoLimite - tempoDecorrido;
+                
+                if (tempoRestante <= 0) {
+                    finalizarSimulado();
+                    return;
+                }
+                
+                const minutos = Math.floor(tempoRestante / 60000);
+                const segundos = Math.floor((tempoRestante % 60000) / 1000);
+                
+                document.getElementById('timer').textContent = 
+                    `${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        function mostrarQuestao(index) {
+            questaoAtualIndex = index;
+            const questao = simuladoAtual.questoes[index];
+            
+            document.getElementById('questao-atual').textContent = index + 1;
+            
+            const container = document.getElementById('questao-container');
+            container.innerHTML = `
+                <div class="questao-numero">Questão ${index + 1}</div>
+                <div class="questao-texto">${questao.question}</div>
+                <div class="opcoes-container">
+                    ${questao.options.map((opcao, i) => `
+                        <div class="opcao ${respostas[index] === i ? 'selecionada' : ''}" onclick="selecionarOpcao(${i})">
+                            <input type="radio" name="questao-${index}" value="${i}" ${respostas[index] === i ? 'checked' : ''}>
+                            <span>${opcao}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            
+            // Atualizar navegação
+            atualizarNavegacao();
+            
+            // Atualizar botões
+            document.getElementById('btn-anterior').style.display = index === 0 ? 'none' : 'block';
+            
+            const btnProximo = document.getElementById('btn-proximo');
+            if (index === simuladoAtual.questoes.length - 1) {
+                btnProximo.textContent = 'Finalizar Simulado';
+                btnProximo.className = 'btn-nav btn-finalizar';
+                btnProximo.onclick = finalizarSimulado;
+            } else {
+                btnProximo.innerHTML = 'Próxima <i class="fas fa-chevron-right"></i>';
+                btnProximo.className = 'btn-nav btn-proximo';
+                btnProximo.onclick = proximaQuestao;
+            }
+        }
+
+        function selecionarOpcao(opcaoIndex) {
+            respostas[questaoAtualIndex] = opcaoIndex;
+            
+            // Atualizar visual
+            document.querySelectorAll('.opcao').forEach((opcao, i) => {
+                opcao.classList.toggle('selecionada', i === opcaoIndex);
+                const radio = opcao.querySelector('input');
+                radio.checked = i === opcaoIndex;
+            });
+            
+            atualizarNavegacao();
+        }
+
+        function atualizarNavegacao() {
+            document.querySelectorAll('.questao-nav').forEach((nav, i) => {
+                nav.classList.remove('atual', 'respondida');
+                
+                if (i === questaoAtualIndex) {
+                    nav.classList.add('atual');
+                } else if (respostas.hasOwnProperty(i)) {
+                    nav.classList.add('respondida');
+                }
+            });
+        }
+
+        function proximaQuestao() {
+            if (questaoAtualIndex < simuladoAtual.questoes.length - 1) {
+                mostrarQuestao(questaoAtualIndex + 1);
+            }
+        }
+
+        function questaoAnterior() {
+            if (questaoAtualIndex > 0) {
+                mostrarQuestao(questaoAtualIndex - 1);
+            }
+        }
+
+        function irParaQuestao(index) {
+            mostrarQuestao(index);
+        }
+
+        function finalizarSimulado() {
+            clearInterval(timerInterval);
+            
+            // Calcular resultado
+            const resultado = calcularResultado();
+            
+            // Salvar no histórico
+            salvarHistorico(resultado);
+            
+            // Mostrar resultado
+            mostrarResultado(resultado);
+        }
+
+        function calcularResultado() {
+            let acertos = 0;
+            const dominios = { development: 0, security: 0, deployment: 0, troubleshooting: 0 };
+            const totalDominios = { development: 0, security: 0, deployment: 0, troubleshooting: 0 };
+            
+            simuladoAtual.questoes.forEach((questao, index) => {
+                const respostaUsuario = respostas[index];
+                const respostaCorreta = questao.correct;
+                
+                // Determinar domínio da questão (simplificado)
+                let dominio = 'development';
+                if (questao.question.includes('IAM') || questao.question.includes('security') || questao.question.includes('KMS')) {
+                    dominio = 'security';
+                } else if (questao.question.includes('deploy') || questao.question.includes('CodePipeline') || questao.question.includes('CloudFormation')) {
+                    dominio = 'deployment';
+                } else if (questao.question.includes('debug') || questao.question.includes('CloudWatch') || questao.question.includes('X-Ray')) {
+                    dominio = 'troubleshooting';
+                }
+                
+                totalDominios[dominio]++;
+                
+                if (respostaUsuario === respostaCorreta) {
+                    acertos++;
+                    dominios[dominio]++;
+                }
+            });
+            
+            const porcentagem = Math.round((acertos / simuladoAtual.questoes.length) * 100);
+            
+            // Definir nota mínima por nível
+            const notasMinimas = {
+                'basico': 72,
+                'intermediario': 75,
+                'avancado': 80
+            };
+            
+            const notaMinima = notasMinimas[simuladoAtual.nivel] || 72;
+            
+            return {
+                acertos,
+                total: simuladoAtual.questoes.length,
+                porcentagem,
+                aprovado: porcentagem >= notaMinima,
+                notaMinima,
+                dominios,
+                totalDominios,
+                nivel: simuladoAtual.nivel,
+                data: new Date().toISOString()
+            };
+        }
+
+        function salvarHistorico(resultado) {
+            const historico = JSON.parse(localStorage.getItem('historico-simulados') || '[]');
+            historico.push({
+                nivel: resultado.nivel,
+                pontuacao: resultado.porcentagem,
+                data: resultado.data,
+                aprovado: resultado.aprovado
+            });
+            localStorage.setItem('historico-simulados', JSON.stringify(historico));
+        }
+
+        function mostrarResultado(resultado) {
+            document.getElementById('simulado-content').style.display = 'none';
+            
+            const container = document.getElementById('resultado-container');
+            container.style.display = 'block';
+            
+            container.innerHTML = `
+                <h2>Resultado do Simulado</h2>
+                <div class="resultado-score ${resultado.aprovado ? 'aprovado' : 'reprovado'}">
+                    ${resultado.porcentagem}%
+                </div>
+                <h3>${resultado.aprovado ? '🎉 Parabéns! Você foi aprovado!' : '📚 Continue estudando!'}</h3>
+                <p>${resultado.acertos} de ${resultado.total} questões corretas</p>
+                <p>Nota mínima para aprovação: ${resultado.notaMinima}%</p>
+                
+                <div class="resultado-detalhes">
+                    <div class="detalhe-dominio">
+                        <h4>Development</h4>
+                        <p>${resultado.dominios.development}/${resultado.totalDominios.development}</p>
+                        <p>${Math.round((resultado.dominios.development / resultado.totalDominios.development) * 100)}%</p>
+                    </div>
+                    <div class="detalhe-dominio">
+                        <h4>Security</h4>
+                        <p>${resultado.dominios.security}/${resultado.totalDominios.security}</p>
+                        <p>${Math.round((resultado.dominios.security / resultado.totalDominios.security) * 100)}%</p>
+                    </div>
+                    <div class="detalhe-dominio">
+                        <h4>Deployment</h4>
+                        <p>${resultado.dominios.deployment}/${resultado.totalDominios.deployment}</p>
+                        <p>${Math.round((resultado.dominios.deployment / resultado.totalDominios.deployment) * 100)}%</p>
+                    </div>
+                    <div class="detalhe-dominio">
+                        <h4>Troubleshooting</h4>
+                        <p>${resultado.dominios.troubleshooting}/${resultado.totalDominios.troubleshooting}</p>
+                        <p>${Math.round((resultado.dominios.troubleshooting / resultado.totalDominios.troubleshooting) * 100)}%</p>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 2rem;">
+                    <button class="btn-primary" onclick="window.location.href='simulados.html'">
+                        Voltar aos Simulados
+                    </button>
+                    <button class="btn-secondary" onclick="refazerSimulado()" style="margin-left: 1rem;">
+                        Refazer Simulado
+                    </button>
+                </div>
+            `;
+        }
+
+        function refazerSimulado() {
+            window.location.reload();
+        }
+        
+        function voltarInicio() {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(0,0,0,0.8); display: flex; justify-content: center;
+                align-items: center; z-index: 4000;
+            `;
+            
+            modal.innerHTML = `
+                <div style="background: white; border-radius: 20px; padding: 3rem; max-width: 500px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+                    <div style="font-size: 4rem; margin-bottom: 1rem;">⚠️</div>
+                    <h3 style="color: #dc3545; margin-bottom: 1rem;">Atenção!</h3>
+                    <p style="margin-bottom: 2rem; color: #666; line-height: 1.6;">Se você sair agora, todo o progresso do simulado será perdido e não poderá ser recuperado.</p>
+                    <div style="display: flex; gap: 1rem; justify-content: center;">
+                        <button onclick="modal.remove()" style="background: #6c757d; color: white; border: none; padding: 1rem 2rem; border-radius: 25px; cursor: pointer; font-weight: 600;">Continuar Simulado</button>
+                        <button onclick="window.location.href='index.html'" style="background: linear-gradient(135deg, #dc3545, #c82333); color: white; border: none; padding: 1rem 2rem; border-radius: 25px; cursor: pointer; font-weight: 600;">Sair Mesmo Assim</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+        
+        // Aviso ao tentar fechar a página
+        window.addEventListener('beforeunload', function(e) {
+            if (document.getElementById('resultado-container').style.display === 'none') {
+                e.preventDefault();
+                e.returnValue = 'Seu progresso será perdido se você sair agora.';
+            }
+        });
+    </script>
+</body>
+</html>

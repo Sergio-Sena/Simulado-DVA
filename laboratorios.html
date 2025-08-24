@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS DVA-C02 - Laboratórios Práticos</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧪</text></svg>">
+    <link rel="stylesheet" href="styles-final.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .labs-container {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+            height: calc(100vh - 200px);
+            margin: 2rem 0;
+        }
+        
+        .labs-sidebar {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            overflow-y: auto;
+        }
+        
+        .lab-item {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .lab-item:hover {
+            border-color: #ff9900;
+            background: #fff8f0;
+        }
+        
+        .lab-item.active {
+            border-color: #ff9900;
+            background: #fff8f0;
+            box-shadow: 0 4px 15px rgba(255, 153, 0, 0.2);
+        }
+        
+        .lab-title {
+            font-weight: 600;
+            color: #232f3e;
+            margin-bottom: 0.5rem;
+        }
+        
+        .lab-description {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .lab-executor {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .lab-header {
+            background: linear-gradient(135deg, #232f3e, #37475a);
+            color: white;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: between;
+            align-items: center;
+        }
+        
+        .lab-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        .code-panel {
+            flex: 1;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'Courier New', monospace;
+            overflow: auto;
+        }
+        
+        .code-editor {
+            padding: 1rem;
+            height: 100%;
+            background: #1e1e1e;
+            border: none;
+            color: #d4d4d4;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            resize: none;
+            outline: none;
+        }
+        
+        .result-panel {
+            flex: 1;
+            background: #0c0c0c;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+        
+        .lab-controls {
+            background: #f8f9fa;
+            padding: 1rem 1.5rem;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .lab-btn {
+            background: #ff9900;
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .lab-btn:hover {
+            background: #e68900;
+            transform: translateY(-2px);
+        }
+        
+        .lab-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .lab-btn.secondary {
+            background: #6c757d;
+        }
+        
+        .lab-btn.secondary:hover {
+            background: #5a6268;
+        }
+        
+        .terminal-line {
+            margin-bottom: 0.5rem;
+        }
+        
+        .terminal-prompt {
+            color: #00ff00;
+        }
+        
+        .terminal-command {
+            color: #ffffff;
+        }
+        
+        .terminal-output {
+            color: #ffff00;
+            margin-left: 1rem;
+        }
+        
+        .terminal-error {
+            color: #ff0000;
+        }
+        
+        .terminal-success {
+            color: #00ff00;
+        }
+        
+        .lab-progress {
+            background: #e9ecef;
+            border-radius: 10px;
+            height: 8px;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+        
+        .lab-progress-bar {
+            background: linear-gradient(90deg, #ff9900, #ffb84d);
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .step-indicator {
+            display: flex;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+        
+        .step {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #666;
+        }
+        
+        .step.active {
+            background: #ff9900;
+            color: white;
+        }
+        
+        .step.completed {
+            background: #28a745;
+            color: white;
+        }
+        
+        @media (max-width: 768px) {
+            .labs-container {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+            
+            .lab-content {
+                flex-direction: column;
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1><i class="fab fa-aws"></i> AWS DVA-C02 Intensivo</h1>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Início</a></li>
+                    <li><a href="curso-completo.html">Curso</a></li>
+                    <li><a href="laboratorios.html" class="active">Laboratórios</a></li>
+                    <li><a href="simulados.html">Simulados</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h2>🧪 Laboratórios Práticos</h2>
+                <p>Aprenda AWS na prática com simuladores interativos</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="container">
+                <div class="labs-container">
+                    <div class="labs-sidebar">
+                        <h3>📚 Labs Disponíveis</h3>
+                        
+                        <div class="lab-item active" onclick="loadLab('vpc-setup')">
+                            <div class="lab-title">🌐 VPC Setup Completo</div>
+                            <div class="lab-description">Criar VPC, subnets, IGW e NAT Gateway</div>
+                        </div>
+                        
+                        <div class="lab-item" onclick="loadLab('lambda-s3')">
+                            <div class="lab-title">⚡ Lambda + S3 Processing</div>
+                            <div class="lab-description">Processamento de arquivos com triggers</div>
+                        </div>
+                        
+                        <div class="lab-item" onclick="loadLab('api-gateway')">
+                            <div class="lab-title">🚪 API Gateway + Authorizer</div>
+                            <div class="lab-description">APIs seguras com autenticação JWT</div>
+                        </div>
+                        
+                        <div class="lab-item" onclick="loadLab('step-functions')">
+                            <div class="lab-title">🔄 Step Functions Workflow</div>
+                            <div class="lab-description">Orquestração de microserviços</div>
+                        </div>
+                        
+                        <div class="lab-item" onclick="loadLab('cloudformation')">
+                            <div class="lab-title">📋 CloudFormation Deploy</div>
+                            <div class="lab-description">Infrastructure as Code com SAM</div>
+                        </div>
+                        
+                        <div class="lab-item" onclick="loadLab('monitoring')">
+                            <div class="lab-title">📊 CloudWatch Monitoring</div>
+                            <div class="lab-description">Métricas, logs e alarmes</div>
+                        </div>
+                    </div>
+                    
+                    <div class="lab-executor">
+                        <div class="lab-header">
+                            <h4 id="current-lab-title">🌐 VPC Setup Completo</h4>
+                            <div class="step-indicator" id="step-indicator">
+                                <div class="step active">1</div>
+                                <div class="step">2</div>
+                                <div class="step">3</div>
+                                <div class="step">4</div>
+                                <div class="step">5</div>
+                            </div>
+                        </div>
+                        
+                        <div class="lab-progress">
+                            <div class="lab-progress-bar" id="lab-progress-bar"></div>
+                        </div>
+                        
+                        <div class="lab-content">
+                            <div class="code-panel">
+                                <textarea id="code-editor" class="code-editor" readonly>#!/bin/bash
+
+# Dia 2 - VPC Setup Completo para DVA-C02
+
+# 1. Criar VPC
+VPC_ID=$(aws ec2 create-vpc --cidr-block 10.0.0.0/16 \
+  --tag-specifications 'ResourceType=vpc,Tags=[{Key=Name,Value=DVA-VPC}]' \
+  --query 'Vpc.VpcId' --output text)
+
+echo "VPC criada: $VPC_ID"
+
+# 2. Criar Internet Gateway
+IGW_ID=$(aws ec2 create-internet-gateway \
+  --tag-specifications 'ResourceType=internet-gateway,Tags=[{Key=Name,Value=DVA-IGW}]' \
+  --query 'InternetGateway.InternetGatewayId' --output text)
+
+# Anexar IGW à VPC
+aws ec2 attach-internet-gateway --vpc-id $VPC_ID --internet-gateway-id $IGW_ID</textarea>
+                            </div>
+                            
+                            <div class="result-panel" id="result-panel">
+                                <div class="terminal-line">
+                                    <span class="terminal-prompt">aws-lab:~$</span> 
+                                    <span class="terminal-command">Aguardando execução...</span>
+                                </div>
+                                <div class="terminal-line">
+                                    <span class="terminal-output">💡 Clique em "Executar Lab" para começar</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="lab-controls">
+                            <button class="lab-btn" onclick="executeLab()" id="execute-btn">
+                                <i class="fas fa-play"></i> Executar Lab
+                            </button>
+                            <button class="lab-btn secondary" onclick="resetLab()">
+                                <i class="fas fa-redo"></i> Reset
+                            </button>
+                            <button class="lab-btn secondary" onclick="nextStep()" id="next-btn" disabled>
+                                <i class="fas fa-arrow-right"></i> Próximo Step
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 AWS DVA-C02 Curso Intensivo. Laboratórios simulados para aprendizado.</p>
+        </div>
+    </footer>
+
+    <script>
+        let currentLab = 'vpc-setup';
+        let currentStep = 0;
+        let isExecuting = false;
+        
+        const labs = {
+            'vpc-setup': {
+                title: '🌐 VPC Setup Completo',
+                steps: 5,
+                code: `#!/bin/bash
+
+# Dia 2 - VPC Setup Completo para DVA-C02
+
+# 1. Criar VPC
+VPC_ID=$(aws ec2 create-vpc --cidr-block 10.0.0.0/16 \\
+  --tag-specifications 'ResourceType=vpc,Tags=[{Key=Name,Value=DVA-VPC}]' \\
+  --query 'Vpc.VpcId' --output text)
+
+echo "VPC criada: $VPC_ID"
+
+# 2. Criar Internet Gateway
+IGW_ID=$(aws ec2 create-internet-gateway \\
+  --tag-specifications 'ResourceType=internet-gateway,Tags=[{Key=Name,Value=DVA-IGW}]' \\
+  --query 'InternetGateway.InternetGatewayId' --output text)
+
+# Anexar IGW à VPC
+aws ec2 attach-internet-gateway --vpc-id $VPC_ID --internet-gateway-id $IGW_ID
+
+# 3. Criar Subnets
+PUBLIC_SUBNET_ID=$(aws ec2 create-subnet --vpc-id $VPC_ID \\
+  --cidr-block 10.0.1.0/24 --availability-zone us-east-1a \\
+  --tag-specifications 'ResourceType=subnet,Tags=[{Key=Name,Value=DVA-Public-1a}]' \\
+  --query 'Subnet.SubnetId' --output text)
+
+PRIVATE_SUBNET_ID=$(aws ec2 create-subnet --vpc-id $VPC_ID \\
+  --cidr-block 10.0.2.0/24 --availability-zone us-east-1a \\
+  --tag-specifications 'ResourceType=subnet,Tags=[{Key=Name,Value=DVA-Private-1a}]' \\
+  --query 'Subnet.SubnetId' --output text)`,
+                execution: [
+                    {
+                        command: 'aws ec2 create-vpc --cidr-block 10.0.0.0/16',
+                        output: 'VPC criada: vpc-0123456789abcdef0',
+                        success: true
+                    },
+                    {
+                        command: 'aws ec2 create-internet-gateway',
+                        output: 'Internet Gateway criado: igw-0123456789abcdef0',
+                        success: true
+                    },
+                    {
+                        command: 'aws ec2 attach-internet-gateway',
+                        output: 'Internet Gateway anexado à VPC com sucesso',
+                        success: true
+                    },
+                    {
+                        command: 'aws ec2 create-subnet (public)',
+                        output: 'Subnet pública criada: subnet-0123456789abcdef0',
+                        success: true
+                    },
+                    {
+                        command: 'aws ec2 create-subnet (private)',
+                        output: 'Setup VPC completo! ✅\nVPC ID: vpc-0123456789abcdef0\nPublic Subnet: subnet-0123456789abcdef0\nPrivate Subnet: subnet-0987654321fedcba0',
+                        success: true
+                    }
+                ]
+            },
+            'lambda-s3': {
+                title: '⚡ Lambda + S3 Processing',
+                steps: 4,
+                code: `import json
+import boto3
+import logging
+from datetime import datetime
+
+# Configurar logging
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+# Clientes AWS
+s3_client = boto3.client('s3')
+dynamodb = boto3.resource('dynamodb')
+
+def lambda_handler(event, context):
+    """
+    Lambda function para processar uploads no S3
+    Triggered por S3 PUT events
+    """
+    
+    try:
+        # Processar cada record do evento S3
+        for record in event['Records']:
+            # Extrair informações do evento
+            bucket_name = record['s3']['bucket']['name']
+            object_key = record['s3']['object']['key']
+            event_name = record['eventName']
+            
+            logger.info(f"Processando: {event_name} - {bucket_name}/{object_key}")
+            
+            # Processar arquivo
+            process_image(bucket_name, object_key)
+        
+        return {
+            'statusCode': 200,
+            'body': json.dumps('Processamento concluído com sucesso')
+        }
+        
+    except Exception as e:
+        logger.error(f"Erro no processamento: {str(e)}")
+        raise e`,
+                execution: [
+                    {
+                        command: 'Simulando upload de arquivo para S3...',
+                        output: 'Arquivo test-image.jpg enviado para bucket dva-uploads',
+                        success: true
+                    },
+                    {
+                        command: 'Lambda function triggered por S3 event',
+                        output: 'Processando: ObjectCreated:Put - dva-uploads/test-image.jpg',
+                        success: true
+                    },
+                    {
+                        command: 'Salvando metadados no DynamoDB',
+                        output: 'Metadados salvos na tabela dva-file-metadata',
+                        success: true
+                    },
+                    {
+                        command: 'Processamento de imagem concluído',
+                        output: 'Arquivo processado e copiado para dva-uploads-processed ✅',
+                        success: true
+                    }
+                ]
+            }
+        };
+        
+        function loadLab(labId) {
+            // Remover active de todos os labs
+            document.querySelectorAll('.lab-item').forEach(item => item.classList.remove('active'));
+            
+            // Adicionar active ao lab selecionado
+            event.target.closest('.lab-item').classList.add('active');
+            
+            currentLab = labId;
+            currentStep = 0;
+            
+            const lab = labs[labId];
+            if (lab) {
+                document.getElementById('current-lab-title').textContent = lab.title;
+                document.getElementById('code-editor').value = lab.code;
+                
+                // Reset steps
+                updateStepIndicator();
+                resetTerminal();
+                updateProgress();
+            }
+        }
+        
+        function executeLab() {
+            if (isExecuting) return;
+            
+            isExecuting = true;
+            currentStep = 0;
+            
+            document.getElementById('execute-btn').disabled = true;
+            document.getElementById('next-btn').disabled = false;
+            
+            resetTerminal();
+            addTerminalLine('aws-lab:~$', 'Iniciando execução do laboratório...', 'command');
+            addTerminalLine('', '🚀 Executando comandos AWS CLI...', 'output');
+            
+            updateProgress();
+        }
+        
+        function nextStep() {
+            const lab = labs[currentLab];
+            if (!lab || currentStep >= lab.execution.length) return;
+            
+            const step = lab.execution[currentStep];
+            
+            // Simular delay de execução
+            setTimeout(() => {
+                addTerminalLine('aws-lab:~$', step.command, 'command');
+                
+                setTimeout(() => {
+                    const outputClass = step.success ? 'success' : 'error';
+                    addTerminalLine('', step.output, outputClass);
+                    
+                    currentStep++;
+                    updateStepIndicator();
+                    updateProgress();
+                    
+                    if (currentStep >= lab.execution.length) {
+                        document.getElementById('next-btn').disabled = true;
+                        addTerminalLine('', '🎉 Laboratório concluído com sucesso!', 'success');
+                        isExecuting = false;
+                    }
+                }, 1000);
+            }, 500);
+        }
+        
+        function resetLab() {
+            currentStep = 0;
+            isExecuting = false;
+            
+            document.getElementById('execute-btn').disabled = false;
+            document.getElementById('next-btn').disabled = true;
+            
+            updateStepIndicator();
+            resetTerminal();
+            updateProgress();
+        }
+        
+        function updateStepIndicator() {
+            const steps = document.querySelectorAll('.step');
+            steps.forEach((step, index) => {
+                step.classList.remove('active', 'completed');
+                if (index < currentStep) {
+                    step.classList.add('completed');
+                } else if (index === currentStep) {
+                    step.classList.add('active');
+                }
+            });
+        }
+        
+        function updateProgress() {
+            const lab = labs[currentLab];
+            if (!lab) return;
+            
+            const progress = (currentStep / lab.steps) * 100;
+            document.getElementById('lab-progress-bar').style.width = progress + '%';
+        }
+        
+        function resetTerminal() {
+            document.getElementById('result-panel').innerHTML = `
+                <div class="terminal-line">
+                    <span class="terminal-prompt">aws-lab:~$</span> 
+                    <span class="terminal-command">Aguardando execução...</span>
+                </div>
+                <div class="terminal-line">
+                    <span class="terminal-output">💡 Clique em "Executar Lab" para começar</span>
+                </div>
+            `;
+        }
+        
+        function addTerminalLine(prompt, text, type = 'output') {
+            const resultPanel = document.getElementById('result-panel');
+            const line = document.createElement('div');
+            line.className = 'terminal-line';
+            
+            if (prompt) {
+                line.innerHTML = `<span class="terminal-prompt">${prompt}</span> <span class="terminal-${type}">${text}</span>`;
+            } else {
+                line.innerHTML = `<span class="terminal-${type}">${text}</span>`;
+            }
+            
+            resultPanel.appendChild(line);
+            resultPanel.scrollTop = resultPanel.scrollHeight;
+        }
+    </script>
+</body>
+</html>

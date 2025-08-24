@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS DVA-C02 - Curso Intensivo 14 Dias</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌍</text></svg>">
+    <link rel="stylesheet" href="styles-final.css">
+    <style>
+        /* UX Improvements */
+        .cta-section {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 4rem 0;
+            text-align: center;
+            border-radius: 20px;
+            margin: 2rem 0;
+        }
+        
+        .cta-button {
+            background: linear-gradient(135deg, #ff9900, #ff6600);
+            color: white;
+            border: none;
+            padding: 1.5rem 3rem;
+            border-radius: 50px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(255, 153, 0, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(255, 153, 0, 0.4);
+        }
+        
+        .diagnostic-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            border: 1px solid #e9ecef;
+        }
+        
+        .nova-avaliacao-btn {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .nova-avaliacao-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3);
+        }
+        
+        .diagnostic-quiz {
+            text-align: center;
+        }
+        
+        .quiz-header h4 {
+            color: white !important;
+            margin-bottom: 0.5rem;
+            font-weight: 300;
+            font-size: 1.3rem;
+        }
+        
+        .quiz-header p {
+            color: white !important;
+            margin-bottom: 2rem;
+            font-weight: 300;
+            font-size: 1rem;
+        }
+        
+        .question-container {
+            margin: 2rem 0;
+        }
+        
+        .question {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #232f3e;
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+        
+        .options {
+            display: grid;
+            gap: 1rem;
+            text-align: left;
+        }
+        
+        .option {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .option:hover {
+            border-color: #ff9900;
+            background: #fff8f0;
+        }
+        
+        .option.selected {
+            border-color: #ff9900;
+            background: #fff8f0;
+            box-shadow: 0 4px 15px rgba(255, 153, 0, 0.2);
+        }
+        
+        .quiz-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2rem;
+        }
+        
+        .quiz-controls button {
+            background: #ff9900;
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .quiz-controls button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .quiz-controls button:not(:disabled):hover {
+            background: #e68900;
+            transform: translateY(-2px);
+        }
+        
+        #question-counter {
+            font-weight: 600;
+            color: #666;
+        }
+    </style>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1><i class="fab fa-aws"></i> AWS DVA-C02 Intensivo</h1>
+            <nav>
+                <ul>
+                    <li><a href="#diagnostico">Diagnóstico</a></li>
+                    <li><a href="curso-completo.html">Curso</a></li>
+                    <li><a href="laboratorios.html">Laboratórios</a></li>
+                    <li><a href="simulados.html">Simulados</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section id="hero" class="hero">
+            <div class="container">
+                <h2>Certificação AWS Developer Associate</h2>
+                <p>Curso intensivo de 14 dias para aprovação garantida</p>
+                <div class="stats">
+                    <div class="stat">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>14 Dias</span>
+                    </div>
+                    <div class="stat">
+                        <i class="fas fa-code"></i>
+                        <span>Hands-on</span>
+                    </div>
+                    <div class="stat">
+                        <i class="fas fa-certificate"></i>
+                        <span>DVA-C02</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="diagnostico" class="section">
+            <div class="container">
+                <h3>📊 Diagnóstico AWS</h3>
+                <div class="diagnostic-card">
+                    <div id="diagnostic-quiz" class="diagnostic-quiz">
+                        <div class="quiz-header">
+                            <h4>Avalie seu conhecimento atual em AWS</h4>
+                            <p>Responda 8 perguntas para receber recomendações personalizadas</p>
+                        </div>
+                        <div class="question-container">
+                            <div class="question" id="question-text"></div>
+                            <div class="options" id="question-options"></div>
+                        </div>
+                        <div class="quiz-controls">
+                            <button id="prev-btn" onclick="previousQuestion()" disabled>Anterior</button>
+                            <span id="question-counter">1/8</span>
+                            <button id="next-btn" onclick="nextQuestion()" disabled>Próxima</button>
+                        </div>
+                    </div>
+                    
+                    <div id="diagnostic-result" class="diagnostic-result" style="display: none;">
+                        <div class="score">
+                            <span class="score-number" id="final-score"></span>
+                            <span class="score-label" id="level-label"></span>
+                        </div>
+                        <div class="recommendations">
+                            <h4>🎯 Recomendações Personalizadas:</h4>
+                            <ul id="recommendations-list"></ul>
+                            <div style="margin-top: 2rem; text-align: center;">
+                                <button class="nova-avaliacao-btn" onclick="novaAvaliacao()">
+                                    <i class="fas fa-redo"></i> Nova Avaliação
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="cronograma" class="section">
+            <div class="container">
+                <h3>📅 Cronograma Intensivo</h3>
+                <div class="timeline">
+                    <div class="week">
+                        <h4>Semana 1: Fundamentos e Compute</h4>
+                        <div class="days">
+                            <div class="day" data-day="1">
+                                <span class="day-number">1-2</span>
+                                <span class="day-title">AWS Core + EC2</span>
+                            </div>
+                            <div class="day" data-day="3">
+                                <span class="day-number">3-4</span>
+                                <span class="day-title">Lambda + Serverless</span>
+                            </div>
+                            <div class="day" data-day="5">
+                                <span class="day-number">5-6</span>
+                                <span class="day-title">Containers + Beanstalk</span>
+                            </div>
+                            <div class="day" data-day="7">
+                                <span class="day-number">7</span>
+                                <span class="day-title">Revisão + Mini Simulado</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="week">
+                        <h4>Semana 2: Storage, Database e DevOps</h4>
+                        <div class="days">
+                            <div class="day" data-day="8">
+                                <span class="day-number">8-9</span>
+                                <span class="day-title">S3 + Storage + DB</span>
+                            </div>
+                            <div class="day" data-day="10">
+                                <span class="day-number">10-11</span>
+                                <span class="day-title">API Gateway + Integration</span>
+                            </div>
+                            <div class="day" data-day="12">
+                                <span class="day-number">12-13</span>
+                                <span class="day-title">CI/CD + Monitoring</span>
+                            </div>
+                            <div class="day" data-day="14">
+                                <span class="day-number">14</span>
+                                <span class="day-title">Simulado Final</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="modulos" class="section">
+            <div class="container">
+                <div class="cta-section">
+                    <h3>🚀 Comece Sua Jornada AWS</h3>
+                    <p style="font-size: 1.2rem; margin-bottom: 2rem; color: #666;">Acesse o curso completo com todos os módulos, conteúdo detalhado e quizzes interativos</p>
+                    <button class="cta-button" onclick="window.location.href='curso-completo.html'">
+                        <i class="fas fa-graduation-cap"></i> Iniciar Curso
+                    </button>
+                </div>
+            </div>
+        </section>
+
+
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 AWS DVA-C02 Curso Intensivo. Baseado na documentação oficial da AWS.</p>
+        </div>
+    </footer>
+
+
+    <script>
+        // Função para gerar diagnóstico randomizado
+        function generateDiagnosticQuestions() {
+            const contextQuestions = [
+                {
+                    question: "Qual sua experiência prática com AWS?",
+                    options: ["Nunca usei", "Alguns tutoriais", "Projetos pessoais", "Uso profissionalmente"],
+                    weights: [0, 1, 2, 3],
+                    domain: "experience"
+                },
+                {
+                    question: "Quanto tempo pretende dedicar ao estudo diário?",
+                    options: ["30 min", "1 hora", "2 horas", "3+ horas"],
+                    weights: [1, 2, 3, 3],
+                    domain: "dedication"
+                }
+            ];
+            
+            // Selecionar 1-2 questões de cada domínio técnico
+            const technicalQuestions = [];
+            
+            // Development (2 questões)
+            const devQuestions = bancoQuestoes.development.sort(() => Math.random() - 0.5).slice(0, 2);
+            devQuestions.forEach(q => {
+                q.domain = 'development';
+                q.weights = q.options.map((_, i) => i === q.correct ? 3 : 0);
+            });
+            
+            // Security (2 questões)
+            const secQuestions = bancoQuestoes.security.sort(() => Math.random() - 0.5).slice(0, 2);
+            secQuestions.forEach(q => {
+                q.domain = 'security';
+                q.weights = q.options.map((_, i) => i === q.correct ? 3 : 0);
+            });
+            
+            // Deployment (1 questão)
+            const depQuestions = bancoQuestoes.deployment.sort(() => Math.random() - 0.5).slice(0, 1);
+            depQuestions.forEach(q => {
+                q.domain = 'deployment';
+                q.weights = q.options.map((_, i) => i === q.correct ? 3 : 0);
+            });
+            
+            // Troubleshooting (1 questão)
+            const troQuestions = bancoQuestoes.troubleshooting.sort(() => Math.random() - 0.5).slice(0, 1);
+            troQuestions.forEach(q => {
+                q.domain = 'troubleshooting';
+                q.weights = q.options.map((_, i) => i === q.correct ? 3 : 0);
+            });
+            
+            // Combinar e embaralhar
+            return [...devQuestions, ...secQuestions, ...depQuestions, ...troQuestions, ...contextQuestions]
+                .sort(() => Math.random() - 0.5);
+        }
+        
+        let diagnosticQuestions = [];
+        
+        let currentQuestion = 0;
+        let answers = [];
+        
+        function initDiagnostic() {
+            diagnosticQuestions = generateDiagnosticQuestions();
+            showQuestion();
+        }
+        
+        function showQuestion() {
+            const question = diagnosticQuestions[currentQuestion];
+            document.getElementById('question-text').textContent = question.question;
+            document.getElementById('question-counter').textContent = `${currentQuestion + 1}/8`;
+            
+            const optionsContainer = document.getElementById('question-options');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'option';
+                optionDiv.textContent = option;
+                optionDiv.onclick = () => selectOption(index, optionDiv);
+                optionsContainer.appendChild(optionDiv);
+            });
+            
+            updateButtons();
+        }
+        
+        function selectOption(index, element) {
+            document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+            element.classList.add('selected');
+            answers[currentQuestion] = index;
+            updateButtons();
+        }
+        
+        function updateButtons() {
+            document.getElementById('prev-btn').disabled = currentQuestion === 0;
+            const hasAnswer = answers[currentQuestion] !== undefined;
+            document.getElementById('next-btn').disabled = !hasAnswer;
+            document.getElementById('next-btn').textContent = currentQuestion === 7 ? 'Finalizar' : 'Próxima';
+        }
+        
+        function nextQuestion() {
+            if (currentQuestion < 7) {
+                currentQuestion++;
+                showQuestion();
+            } else {
+                showResults();
+            }
+        }
+        
+        function previousQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                showQuestion();
+            }
+        }
+        
+        function showResults() {
+            let technicalScore = 0;
+            let experienceScore = 0;
+            let domainScores = { development: 0, security: 0, deployment: 0, troubleshooting: 0 };
+            let domainCounts = { development: 0, security: 0, deployment: 0, troubleshooting: 0 };
+            
+            answers.forEach((answer, index) => {
+                const question = diagnosticQuestions[index];
+                const score = question.weights[answer];
+                
+                if (question.domain === 'experience' || question.domain === 'dedication') {
+                    experienceScore += score;
+                } else {
+                    // Questão técnica - verificar se acertou
+                    if (question.correct !== undefined) {
+                        const isCorrect = answer === question.correct;
+                        technicalScore += isCorrect ? 3 : 0;
+                        domainScores[question.domain] += isCorrect ? 3 : 0;
+                        domainCounts[question.domain]++;
+                    }
+                }
+            });
+            
+            // Cálculo híbrido: 70% técnico + 30% experiência
+            const maxTechnical = 18; // 6 questões técnicas * 3 pontos
+            const maxExperience = 6;  // 2 questões experiência * 3 pontos
+            
+            const technicalPercentage = (technicalScore / maxTechnical) * 100;
+            const experiencePercentage = (experienceScore / maxExperience) * 100;
+            const finalScore = (technicalPercentage * 0.7) + (experiencePercentage * 0.3);
+            
+            // Análise por domínio
+            const weakDomains = [];
+            Object.keys(domainScores).forEach(domain => {
+                if (domainCounts[domain] > 0) {
+                    const domainPercentage = (domainScores[domain] / (domainCounts[domain] * 3)) * 100;
+                    if (domainPercentage < 50) {
+                        weakDomains.push(domain);
+                    }
+                }
+            });
+            
+            let level, recommendations;
+            if (finalScore < 40) {
+                level = "Iniciante";
+                recommendations = [
+                    "✅ Comece pelos fundamentos AWS",
+                    "✅ Foque nos serviços core (EC2, S3, Lambda)",
+                    "✅ Pratique com labs hands-on básicos",
+                    "✅ Use simulados básicos (72%)"
+                ];
+            } else if (finalScore < 70) {
+                level = "Intermediário";
+                recommendations = [
+                    "✅ Aprofunde conhecimentos em serviços específicos",
+                    "✅ Pratique integrações entre serviços",
+                    "✅ Foque em segurança e melhores práticas",
+                    "✅ Use simulados intermediários (75%)"
+                ];
+            } else {
+                level = "Avançado";
+                recommendations = [
+                    "✅ Foco em cenários complexos e edge cases",
+                    "✅ Hands-on avançados com múltiplos serviços",
+                    "✅ Otimizações e arquiteturas escaláveis",
+                    "✅ Simulados avançados (80%)"
+                ];
+            }
+            
+            // Adicionar recomendações específicas por domínio fraco
+            if (weakDomains.length > 0) {
+                const domainNames = {
+                    development: "Development",
+                    security: "Security", 
+                    deployment: "Deployment",
+                    troubleshooting: "Troubleshooting"
+                };
+                recommendations.push(`⚠️ Reforce: ${weakDomains.map(d => domainNames[d]).join(', ')}`);
+            }
+            
+            document.getElementById('final-score').textContent = `${Math.round(finalScore)}%`;
+            document.getElementById('level-label').textContent = `Nível ${level}`;
+            
+            const recList = document.getElementById('recommendations-list');
+            recList.innerHTML = '';
+            recommendations.forEach(rec => {
+                const li = document.createElement('li');
+                li.textContent = rec;
+                recList.appendChild(li);
+            });
+            
+            document.getElementById('diagnostic-quiz').style.display = 'none';
+            document.getElementById('diagnostic-result').style.display = 'block';
+        }
+        
+        function novaAvaliacao() {
+            currentQuestion = 0;
+            answers = [];
+            document.getElementById('diagnostic-quiz').style.display = 'block';
+            document.getElementById('diagnostic-result').style.display = 'none';
+            initDiagnostic();
+        }
+        
+        // Inicializar diagnóstico ao carregar a página
+        document.addEventListener('DOMContentLoaded', initDiagnostic);
+    </script>
+</body>
+</html>

@@ -1,0 +1,256 @@
+{
+  "Comment": "Order Processing Workflow - DVA-C02",
+  "StartAt": "ValidateOrder",
+  "States": {
+    "ValidateOrder": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-east-1:123456789012:function:ValidateOrder",
+      "Parameters": {
+        "orderId.$": "$.orderId",
+        "customerId.$": "$.customerId",
+        "items.$": "$.items",
+        "totalAmount.$": "$.totalAmount"
+      },
+      "ResultPath": "$.validation",
+      "Retry": [
+        {
+          "ErrorEquals": ["Lambda.ServiceException", "Lambda.AWSLambdaException"],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 3,
+          "BackoffRate": 2.0
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": ["ValidationError"],
+          "Next": "OrderValidationFailed",
+          "ResultPath": "$.error"
+        }
+      ],
+      "Next": "CheckInventory"
+    },
+    
+    "CheckInventory": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-east-1:123456789012:function:CheckInventory",
+      "Parameters": {
+        "items.$": "$.items"
+      },
+      "ResultPath": "$.inventory",
+      "Retry": [
+        {
+          "ErrorEquals": ["States.TaskFailed"],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 2,
+          "BackoffRate": 2.0
+        }
+      ],
+      "Next": "InventoryAvailable?"
+    },
+    
+    "InventoryAvailable?": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.inventory.available",
+          "BooleanEquals": true,
+          "Next": "ProcessPaymentAndFulfillment"
+        },
+        {
+          "Variable": "$.inventory.available",
+          "BooleanEquals": false,
+          "Next": "BackorderProcess"
+        }
+      ],
+      "Default": "OrderProcessingFailed"
+    },
+    
+    "ProcessPaymentAndFulfillment": {
+      "Type": "Parallel",
+      "Branches": [
+        {
+          "StartAt": "ProcessPayment",
+          "States": {
+            "ProcessPayment": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:us-east-1:123456789012:function:ProcessPayment",
+              "Parameters": {
+                "orderId.$": "$.orderId",
+                "customerId.$": "$.customerId",
+                "amount.$": "$.totalAmount",
+                "paymentMethod.$": "$.paymentMethod"
+              },
+              "Retry": [
+                {
+                  "ErrorEquals": ["PaymentDeclined"],
+                  "IntervalSeconds": 5,
+                  "MaxAttempts": 2,
+                  "BackoffRate": 1.5
+                }
+              ],
+              "Catch": [
+                {
+                  "ErrorEquals": ["PaymentFailed"],
+                  "Next": "PaymentFailedState"
+                }
+              ],
+              "Next": "PaymentSuccessState"
+            },
+            "PaymentSuccessState": {
+              "Type": "Pass",
+              "Result": {
+                "status": "payment_completed"
+              },
+              "End": true
+            },
+            "PaymentFailedState": {
+              "Type": "Fail",
+              "Cause": "Payment processing failed",
+              "Error": "PaymentError"
+            }
+          }
+        },
+        {
+          "StartAt": "ReserveInventory",
+          "States": {
+            "ReserveInventory": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:us-east-1:123456789012:function:ReserveInventory",
+              "Parameters": {
+                "orderId.$": "$.orderId",
+                "items.$": "$.items"
+              },
+              "Next": "PrepareShipment"
+            },
+            "PrepareShipment": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:us-east-1:123456789012:function:PrepareShipment",
+              "Parameters": {
+                "orderId.$": "$.orderId",
+                "shippingAddress.$": "$.shippingAddress",
+                "items.$": "$.items"
+              },
+              "End": true
+            }
+          }
+        }
+      ],
+      "ResultPath": "$.processing",
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "RollbackOrder",
+          "ResultPath": "$.error"
+        }
+      ],
+      "Next": "SendConfirmation"
+    },
+    
+    "BackorderProcess": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-east-1:123456789012:function:CreateBackorder",
+      "Parameters": {
+        "orderId.$": "$.orderId",
+        "customerId.$": "$.customerId",
+        "unavailableItems.$": "$.inventory.unavailableItems"
+      },
+      "Next": "WaitForInventory"
+    },
+    
+    "WaitForInventory": {
+      "Type": "Wait",
+      "Seconds": 3600,
+      "Next": "CheckInventoryAgain"
+    },
+    
+    "CheckInventoryAgain": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-east-1:123456789012:function:CheckInventory",
+      "Parameters": {
+        "items.$": "$.items"
+      },
+      "ResultPath": "$.inventory",
+      "Next": "InventoryAvailableAfterWait?"
+    },
+    
+    "InventoryAvailableAfterWait?": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.inventory.available",
+          "BooleanEquals": true,
+          "Next": "ProcessPaymentAndFulfillment"
+        }
+      ],
+      "Default": "CancelOrder"
+    },
+    
+    "SendConfirmation": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sns:publish",
+      "Parameters": {
+        "TopicArn": "arn:aws:sns:us-east-1:123456789012:order-confirmations",
+        "Message": {
+          "orderId.$": "$.orderId",
+          "customerId.$": "$.customerId",
+          "status": "confirmed",
+          "trackingNumber.$": "$.processing[1].trackingNumber"
+        }
+      },
+      "Next": "OrderCompleted"
+    },
+    
+    "RollbackOrder": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-east-1:123456789012:function:RollbackOrder",
+      "Parameters": {
+        "orderId.$": "$.orderId",
+        "reason.$": "$.error.Cause"
+      },
+      "Next": "OrderProcessingFailed"
+    },
+    
+    "CancelOrder": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-east-1:123456789012:function:CancelOrder",
+      "Parameters": {
+        "orderId.$": "$.orderId",
+        "reason": "Inventory unavailable after waiting period"
+      },
+      "Next": "OrderCancelled"
+    },
+    
+    "OrderCompleted": {
+      "Type": "Pass",
+      "Result": {
+        "status": "completed",
+        "message": "Order processed successfully"
+      },
+      "End": true
+    },
+    
+    "OrderValidationFailed": {
+      "Type": "Pass",
+      "Parameters": {
+        "status": "validation_failed",
+        "error.$": "$.error"
+      },
+      "End": true
+    },
+    
+    "OrderProcessingFailed": {
+      "Type": "Fail",
+      "Cause": "Order processing failed",
+      "Error": "ProcessingError"
+    },
+    
+    "OrderCancelled": {
+      "Type": "Pass",
+      "Result": {
+        "status": "cancelled",
+        "message": "Order cancelled due to inventory unavailability"
+      },
+      "End": true
+    }
+  }
+}

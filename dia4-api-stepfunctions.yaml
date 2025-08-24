@@ -1,0 +1,323 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: 'DVA-C02 - API Gateway com Step Functions Integration'
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues: [dev, staging, prod]
+
+Resources:
+  # Step Functions State Machine
+  OrderProcessingStateMachine:
+    Type: AWS::StepFunctions::StateMachine
+    Properties:
+      StateMachineName: !Sub 'dva-order-processing-${Environment}'
+      DefinitionString: !Sub |
+        {
+          "Comment": "Order Processing Workflow",
+          "StartAt": "ValidateOrder",
+          "States": {
+            "ValidateOrder": {
+              "Type": "Task",
+              "Resource": "${ValidateOrderFunction.Arn}",
+              "Next": "OrderCompleted"
+            },
+            "OrderCompleted": {
+              "Type": "Pass",
+              "Result": {"status": "completed"},
+              "End": true
+            }
+          }
+        }
+      RoleArn: !GetAtt StepFunctionsRole.Arn
+
+  # IAM Role para Step Functions
+  StepFunctionsRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: states.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: StepFunctionsExecutionPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource: !GetAtt ValidateOrderFunction.Arn
+              - Effect: Allow
+                Action:
+                  - sns:Publish
+                Resource: !Ref OrderNotificationTopic
+
+  # Lambda Functions
+  ValidateOrderFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub 'dva-validate-order-${Environment}'
+      Runtime: python3.9
+      Handler: index.lambda_handler
+      InlineCode: |
+        import json
+        def lambda_handler(event, context):
+            # Validação simples do pedido
+            order_id = event.get('orderId')
+            if not order_id:
+                raise Exception('ValidationError: Order ID is required')
+            
+            return {
+                'orderId': order_id,
+                'status': 'validated',
+                'timestamp': context.aws_request_id
+            }
+
+  AuthorizerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub 'dva-authorizer-${Environment}'
+      Runtime: python3.9
+      Handler: dia4-authorizer.lambda_handler
+      CodeUri: ./
+      Environment:
+        Variables:
+          TOKEN_CACHE_TABLE: !Ref TokenCacheTable
+
+  # DynamoDB para cache de tokens
+  TokenCacheTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub 'dva-token-cache-${Environment}'
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: token_hash
+          AttributeType: S
+      KeySchema:
+        - AttributeName: token_hash
+          KeyType: HASH
+      TimeToLiveSpecification:
+        AttributeName: ttl
+        Enabled: true
+
+  # SNS Topic para notificações
+  OrderNotificationTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: !Sub 'dva-order-notifications-${Environment}'
+
+  # API Gateway
+  OrderProcessingAPI:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub 'dva-order-api-${Environment}'
+      StageName: !Ref Environment
+      
+      # Configurações CORS
+      Cors:
+        AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+        AllowOrigin: "'*'"
+      
+      # Authorizer personalizado
+      Auth:
+        DefaultAuthorizer: LambdaAuthorizer
+        Authorizers:
+          LambdaAuthorizer:
+            FunctionArn: !GetAtt AuthorizerFunction.Arn
+            Identity:
+              Headers:
+                - Authorization
+      
+      # Definições da API
+      DefinitionBody:
+        openapi: '3.0.1'
+        info:
+          title: Order Processing API
+          version: '1.0'
+        
+        paths:
+          /orders:
+            post:
+              summary: Create new order
+              security:
+                - LambdaAuthorizer: []
+              requestBody:
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      type: object
+                      properties:
+                        customerId:
+                          type: string
+                        items:
+                          type: array
+                        totalAmount:
+                          type: number
+              responses:
+                '200':
+                  description: Order created successfully
+                '400':
+                  description: Invalid request
+                '401':
+                  description: Unauthorized
+              x-amazon-apigateway-integration:
+                type: aws
+                httpMethod: POST
+                uri: !Sub 'arn:aws:apigateway:${AWS::Region}:states:action/StartExecution'
+                credentials: !GetAtt APIGatewayStepFunctionsRole.Arn
+                requestTemplates:
+                  application/json: !Sub |
+                    {
+                      "stateMachineArn": "${OrderProcessingStateMachine}",
+                      "input": "$util.escapeJavaScript($input.body)"
+                    }
+                responses:
+                  default:
+                    statusCode: 200
+                    responseTemplates:
+                      application/json: |
+                        {
+                          "executionArn": "$input.path('$.executionArn')",
+                          "startDate": "$input.path('$.startDate')"
+                        }
+          
+          /orders/{orderId}/status:
+            get:
+              summary: Get order status
+              security:
+                - LambdaAuthorizer: []
+              parameters:
+                - name: orderId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+              responses:
+                '200':
+                  description: Order status retrieved
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                httpMethod: POST
+                uri: !Sub '${GetOrderStatusFunction.Arn}'
+
+  # IAM Role para API Gateway chamar Step Functions
+  APIGatewayStepFunctionsRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: apigateway.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: StepFunctionsExecutionPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - states:StartExecution
+                Resource: !Ref OrderProcessingStateMachine
+
+  # Lambda para consultar status do pedido
+  GetOrderStatusFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub 'dva-get-order-status-${Environment}'
+      Runtime: python3.9
+      Handler: index.lambda_handler
+      InlineCode: |
+        import json
+        import boto3
+        
+        stepfunctions = boto3.client('stepfunctions')
+        
+        def lambda_handler(event, context):
+            order_id = event['pathParameters']['orderId']
+            
+            # Em produção: buscar execution ARN do DynamoDB
+            # Para demo: retornar status mock
+            
+            return {
+                'statusCode': 200,
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                },
+                'body': json.dumps({
+                    'orderId': order_id,
+                    'status': 'processing',
+                    'lastUpdated': '2024-01-01T12:00:00Z'
+                })
+            }
+      Events:
+        GetOrderStatus:
+          Type: Api
+          Properties:
+            RestApiId: !Ref OrderProcessingAPI
+            Path: /orders/{orderId}/status
+            Method: GET
+
+  # CloudWatch Dashboard
+  OrderProcessingDashboard:
+    Type: AWS::CloudWatch::Dashboard
+    Properties:
+      DashboardName: !Sub 'DVA-OrderProcessing-${Environment}'
+      DashboardBody: !Sub |
+        {
+          "widgets": [
+            {
+              "type": "metric",
+              "properties": {
+                "metrics": [
+                  ["AWS/StepFunctions", "ExecutionsSucceeded", "StateMachineArn", "${OrderProcessingStateMachine}"],
+                  [".", "ExecutionsFailed", ".", "."],
+                  [".", "ExecutionsStarted", ".", "."]
+                ],
+                "period": 300,
+                "stat": "Sum",
+                "region": "${AWS::Region}",
+                "title": "Step Functions Executions"
+              }
+            },
+            {
+              "type": "metric",
+              "properties": {
+                "metrics": [
+                  ["AWS/ApiGateway", "Count", "ApiName", "${OrderProcessingAPI}"],
+                  [".", "4XXError", ".", "."],
+                  [".", "5XXError", ".", "."]
+                ],
+                "period": 300,
+                "stat": "Sum",
+                "region": "${AWS::Region}",
+                "title": "API Gateway Requests"
+              }
+            }
+          ]
+        }
+
+Outputs:
+  APIEndpoint:
+    Description: 'API Gateway endpoint URL'
+    Value: !Sub 'https://${OrderProcessingAPI}.execute-api.${AWS::Region}.amazonaws.com/${Environment}'
+    Export:
+      Name: !Sub '${AWS::StackName}-APIEndpoint'
+
+  StateMachineArn:
+    Description: 'Step Functions State Machine ARN'
+    Value: !Ref OrderProcessingStateMachine
+
+  DashboardURL:
+    Description: 'CloudWatch Dashboard URL'
+    Value: !Sub 'https://${AWS::Region}.console.aws.amazon.com/cloudwatch/home?region=${AWS::Region}#dashboards:name=${OrderProcessingDashboard}'
