@@ -2,44 +2,14 @@ service: dva-c02-course
 
 provider:
   name: aws
-  runtime: nodejs18.x
   region: us-east-1
-  stage: ${opt:stage, 'dev'}
+  stage: ${opt:stage, 'prod'}
   
 custom:
-  customDomain:
-    domainName: ${self:custom.domains.${self:provider.stage}}
-    certificateName: '*.sstechnologies-cloud.com'
-    createRoute53Record: true
-    endpointType: 'regional'
-    securityPolicy: tls_1_2
-    apiType: rest
-    autoDomain: false
-  
   domains:
-    dev: dev-dva.sstechnologies-cloud.com
-    staging: staging-dva.sstechnologies-cloud.com
     prod: dva.sstechnologies-cloud.com
   
-  s3Sync:
-    - bucketName: ${self:custom.buckets.${self:provider.stage}}
-      localDir: ./
-      acl: public-read
-      followSymlinks: true
-      defaultContentType: text/html
-      params:
-        - "*.html":
-            ContentType: text/html
-        - "*.css":
-            ContentType: text/css
-        - "*.js":
-            ContentType: application/javascript
-        - "*.json":
-            ContentType: application/json
-  
   buckets:
-    dev: dva-c02-course-dev-${aws:accountId}
-    staging: dva-c02-course-staging-${aws:accountId}
     prod: dva-c02-course-prod-${aws:accountId}
 
 resources:
@@ -48,7 +18,7 @@ resources:
     WebsiteBucket:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: ${self:custom.buckets.${self:provider.stage}}
+        BucketName: dva-c02-course-prod-${aws:accountId}
         WebsiteConfiguration:
           IndexDocument: index.html
           ErrorDocument: index.html
@@ -105,7 +75,7 @@ resources:
             DefaultTTL: 86400
             MaxTTL: 31536000
           Aliases:
-            - ${self:custom.domains.${self:provider.stage}}
+            - dva.sstechnologies-cloud.com
           ViewerCertificate:
             AcmCertificateArn: 
               Ref: SSLCertificate
@@ -116,24 +86,18 @@ resources:
     SSLCertificate:
       Type: AWS::CertificateManager::Certificate
       Properties:
-        DomainName: ${self:custom.domains.${self:provider.stage}}
+        DomainName: dva.sstechnologies-cloud.com
         ValidationMethod: DNS
         DomainValidationOptions:
-          - DomainName: ${self:custom.domains.${self:provider.stage}}
-            HostedZoneId: !Ref HostedZone
-    
-    # Route53 Hosted Zone
-    HostedZone:
-      Type: AWS::Route53::HostedZone
-      Properties:
-        Name: sstechnologies-cloud.com
+          - DomainName: dva.sstechnologies-cloud.com
+            HostedZoneId: Z07937031ROGP6XAEMPWJ
     
     # Route53 Record
     DNSRecord:
       Type: AWS::Route53::RecordSet
       Properties:
-        HostedZoneId: !Ref HostedZone
-        Name: ${self:custom.domains.${self:provider.stage}}
+        HostedZoneId: Z07937031ROGP6XAEMPWJ
+        Name: dva.sstechnologies-cloud.com
         Type: A
         AliasTarget:
           DNSName: !GetAtt CloudFrontDistribution.DomainName
@@ -142,7 +106,7 @@ resources:
   Outputs:
     WebsiteURL:
       Description: Website URL
-      Value: https://${self:custom.domains.${self:provider.stage}}
+      Value: https://dva.sstechnologies-cloud.com
     
     CloudFrontDistributionId:
       Description: CloudFront Distribution ID
@@ -152,16 +116,6 @@ resources:
       Description: S3 Bucket Name
       Value: !Ref WebsiteBucket
 
-plugins:
-  - serverless-s3-sync
-  - serverless-domain-manager
-  - serverless-cloudfront-invalidate
+# Plugins removidos - deploy manual via CLI
 
-package:
-  patterns:
-    - '!node_modules/**'
-    - '!.git/**'
-    - '!.github/**'
-    - '!README.md'
-    - '!serverless.yml'
-    - '!package*.json'
+# Site estático - sem packaging necessário

@@ -73,14 +73,11 @@ jobs:
       
       - name: Sync to S3 Development
         run: |
-          aws s3 sync . s3://dva-c02-course-dev-${{ secrets.AWS_ACCOUNT_ID }} --delete --exclude ".git/*" --exclude ".github/*" --exclude "*.md"
+          aws s3 sync . s3://dva-c02-course-dev --delete --exclude ".git/*" --exclude ".github/*" --exclude "*.md" --exclude "node_modules/*" --exclude "package*.json" --exclude "serverless.yml" --exclude "cloudfront-config.json"
       
       - name: Invalidate CloudFront
         run: |
-          DISTRIBUTION_ID=$(aws cloudfront list-distributions --query "DistributionList.Items[?Comment=='dva-c02-course-dev'].Id" --output text)
-          if [ ! -z "$DISTRIBUTION_ID" ]; then
-            aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID --paths "/*"
-          fi
+          echo "Development environment - no CloudFront configured"
       
       - name: Comment PR with dev URL
         if: github.event_name == 'pull_request'
@@ -114,14 +111,11 @@ jobs:
       
       - name: Sync to S3 Staging
         run: |
-          aws s3 sync . s3://dva-c02-course-staging-${{ secrets.AWS_ACCOUNT_ID }} --delete --exclude ".git/*" --exclude ".github/*" --exclude "*.md"
+          aws s3 sync . s3://dva-c02-course-staging --delete --exclude ".git/*" --exclude ".github/*" --exclude "*.md" --exclude "node_modules/*" --exclude "package*.json" --exclude "serverless.yml" --exclude "cloudfront-config.json"
       
       - name: Invalidate CloudFront
         run: |
-          DISTRIBUTION_ID=$(aws cloudfront list-distributions --query "DistributionList.Items[?Comment=='dva-c02-course-staging'].Id" --output text)
-          if [ ! -z "$DISTRIBUTION_ID" ]; then
-            aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID --paths "/*"
-          fi
+          echo "Staging environment - no CloudFront configured"
       
       - name: Run smoke tests
         run: |
@@ -155,14 +149,11 @@ jobs:
       
       - name: Sync to S3 Production
         run: |
-          aws s3 sync . s3://dva-c02-course-prod-${{ secrets.AWS_ACCOUNT_ID }} --delete --exclude ".git/*" --exclude ".github/*" --exclude "*.md"
+          aws s3 sync . s3://dva-c02-course-prod --delete --exclude ".git/*" --exclude ".github/*" --exclude "*.md" --exclude "node_modules/*" --exclude "package*.json" --exclude "serverless.yml" --exclude "cloudfront-config.json"
       
       - name: Invalidate CloudFront
         run: |
-          DISTRIBUTION_ID=$(aws cloudfront list-distributions --query "DistributionList.Items[?Comment=='dva-c02-course-prod'].Id" --output text)
-          if [ ! -z "$DISTRIBUTION_ID" ]; then
-            aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID --paths "/*"
-          fi
+          aws cloudfront create-invalidation --distribution-id E26AJFZZPE428D --paths "/*"
       
       - name: Verify production deployment
         run: |
@@ -191,5 +182,5 @@ jobs:
       
       - name: Rollback to stable version
         run: |
-          aws s3 sync . s3://dva-c02-course-prod-${{ secrets.AWS_ACCOUNT_ID }} --delete --exclude ".git/*" --exclude ".github/*" --exclude "*.md"
+          aws s3 sync . s3://dva-c02-course-prod --delete --exclude ".git/*" --exclude ".github/*" --exclude "*.md" --exclude "node_modules/*" --exclude "package*.json" --exclude "serverless.yml" --exclude "cloudfront-config.json"
           echo "Rollback to stable version completed!"
