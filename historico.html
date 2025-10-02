@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Histórico & Análise - AWS DVA-C02</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="aws-logo">
+                <span class="aws-text">AWS</span>
+            </div>
+            <h1>Histórico & Análise</h1>
+            <p class="subtitle">Acompanhe sua evolução no DVA-C02</p>
+        </header>
+
+        <main class="main-content">
+            <div class="history-overview">
+                <h2>Resumo Geral</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-value" id="totalAttempts">0</div>
+                        <div class="stat-label">Simulados Realizados</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🎯</div>
+                        <div class="stat-value" id="averageScore">0</div>
+                        <div class="stat-label">Pontuação Média</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📈</div>
+                        <div class="stat-value" id="improvement">0%</div>
+                        <div class="stat-label">Melhoria</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-value" id="passRate">0%</div>
+                        <div class="stat-label">Taxa de Aprovação</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="performance-analysis">
+                <h2>Performance por Domínio</h2>
+                <div class="domain-performance" id="domainPerformance">
+                    <!-- Será preenchido dinamicamente -->
+                </div>
+            </div>
+
+            <div class="history-timeline">
+                <h2>Histórico de Simulados</h2>
+                <div class="timeline-container" id="timelineContainer">
+                    <!-- Será preenchido dinamicamente -->
+                </div>
+            </div>
+
+            <div class="actions-section">
+                <button class="action-button secondary" onclick="clearHistory()">
+                    Limpar Histórico
+                </button>
+                <button class="action-button primary" onclick="goHome()">
+                    Voltar ao Início
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <script src="historico.js"></script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulado AWS DVA-C02 - Em Andamento</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header com informações essenciais -->
+        <header class="exam-header">
+            <div class="exam-info">
+                <div class="exam-title">AWS DVA-C02</div>
+                <div class="exam-stats">
+                    <span class="timer" id="timer">130:00</span>
+                    <span class="domain-badge" id="domain-badge">Desenvolvimento</span>
+                    <span class="question-counter">Questão <span id="current-question">1</span>/<span id="total-questions">65</span></span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Barra de progresso -->
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <div class="progress-text">
+                <span id="answered-count">0</span> de <span id="total-questions-progress">65</span> respondidas
+            </div>
+        </div>
+
+        <!-- Questão principal -->
+        <main class="question-main">
+            <div class="question-container">
+                <div class="question-text" id="question-text">
+                    Carregando questão...
+                </div>
+                
+                <div class="options-container" id="options-container">
+                    <!-- Opções serão inseridas dinamicamente -->
+                </div>
+            </div>
+        </main>
+
+        <!-- Controles de navegação -->
+        <footer class="exam-footer">
+            <div class="nav-controls">
+                <button id="prev-question" class="nav-btn" disabled>← Anterior</button>
+                <button id="flag-question" class="flag-btn">🚩 Marcar</button>
+                <button id="finish-exam" class="finish-btn">Finalizar</button>
+                <button id="next-question" class="nav-btn">Próxima →</button>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Modal de Confirmação -->
+    <div id="finish-modal" class="modal">
+        <div class="modal-content">
+            <h3>Finalizar Exame</h3>
+            <p>Tem certeza que deseja finalizar o exame?</p>
+            <div class="modal-stats">
+                <p>Respondidas: <span id="modal-answered">0</span>/65</p>
+                <p>Marcadas: <span id="modal-flagged">0</span></p>
+            </div>
+            <div class="modal-buttons">
+                <button id="cancel-finish" class="cancel-btn">Cancelar</button>
+                <button id="confirm-finish" class="confirm-btn">Finalizar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="questions-database.js"></script>
+    <script src="simulado.js"></script>
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulado AWS DVA-C02</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="aws-logo">
+                <span class="aws-text">AWS</span>
+            </div>
+            <h1>Simulado DVA-C02</h1>
+            <p class="subtitle">AWS Certified Developer Associate</p>
+        </header>
+
+        <main class="main-content">
+            <div class="exam-info">
+                <h2>Informações do Simulado</h2>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Questões:</span>
+                        <span class="info-value">65</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Tipo:</span>
+                        <span class="info-value">Casos reais de uso</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Pontuação:</span>
+                        <span class="info-value">100 - 1000 pontos</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Aprovação:</span>
+                        <span class="info-value">720 pontos (72%)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="description">
+                <p>Este simulado foi desenvolvido com base em casos reais de uso da AWS, seguindo o formato oficial do exame DVA-C02. Teste seus conhecimentos em desenvolvimento, segurança, implantação e otimização na AWS.</p>
+            </div>
+
+            <div class="start-section">
+                <div class="mode-selection">
+                    <h3>Escolha o Modo de Estudo</h3>
+                    
+                    <div class="mode-card" onclick="iniciarSimulado('completo')">
+                        <div class="mode-icon">📝</div>
+                        <h4>Simulado Completo</h4>
+                        <p>65 questões • 130 minutos • Todos os domínios</p>
+                    </div>
+                    
+                    <div class="mode-card" onclick="mostrarDominios()">
+                        <div class="mode-icon">🎯</div>
+                        <h4>Prática por Domínio</h4>
+                        <p>Estudo focado • 15-20 questões • Sem timer</p>
+                    </div>
+                    
+                    <div class="mode-card" onclick="mostrarHistorico()">
+                        <div class="mode-icon">📊</div>
+                        <h4>Histórico & Análise</h4>
+                        <p>Acompanhe sua evolução • Performance por domínio</p>
+                    </div>
+                    
+                    <div class="mode-card" onclick="iniciarRevisao()">
+                        <div class="mode-icon">🔄</div>
+                        <h4>Modo Revisão</h4>
+                        <p>Questões erradas • Marcadas para revisão</p>
+                    </div>
+                </div>
+                
+                <!-- Modal de seleção de domínio -->
+                <div id="domainModal" class="modal" style="display: none;">
+                    <div class="modal-content">
+                        <h3>Selecione o Domínio para Prática</h3>
+                        <div class="domain-options">
+                            <div class="domain-option" onclick="iniciarPratica('Desenvolvimento')">
+                                <span class="domain-badge desenvolvimento">Desenvolvimento</span>
+                                <span class="domain-count">~100 questões</span>
+                            </div>
+                            <div class="domain-option" onclick="iniciarPratica('Segurança')">
+                                <span class="domain-badge seguranca">Segurança</span>
+                                <span class="domain-count">~75 questões</span>
+                            </div>
+                            <div class="domain-option" onclick="iniciarPratica('Implantação')">
+                                <span class="domain-badge implantacao">Implantação</span>
+                                <span class="domain-count">~60 questões</span>
+                            </div>
+                            <div class="domain-option" onclick="iniciarPratica('Otimização')">
+                                <span class="domain-badge otimizacao">Otimização</span>
+                                <span class="domain-count">~40 questões</span>
+                            </div>
+                        </div>
+                        <button class="cancel-btn" onclick="fecharModal()">Cancelar</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>&copy; 2024 Simulado AWS DVA-C02 - Preparação para Certificação</p>
+        </footer>
+    </div>
+
+    <script>
+        function iniciarSimulado(modo = 'completo') {
+            localStorage.setItem('examMode', modo);
+            window.location.href = 'simulado.html';
+        }
+        
+        function mostrarDominios() {
+            document.getElementById('domainModal').style.display = 'flex';
+        }
+        
+        function fecharModal() {
+            document.getElementById('domainModal').style.display = 'none';
+        }
+        
+        function iniciarPratica(dominio) {
+            localStorage.setItem('examMode', 'pratica');
+            localStorage.setItem('selectedDomain', dominio);
+            window.location.href = 'simulado.html';
+        }
+        
+        function mostrarHistorico() {
+            window.location.href = 'historico.html';
+        }
+        
+        function iniciarRevisao() {
+            const wrongQuestions = JSON.parse(localStorage.getItem('wrongQuestions') || '[]');
+            const flaggedQuestions = JSON.parse(localStorage.getItem('flaggedQuestions') || '[]');
+            
+            if (wrongQuestions.length === 0 && flaggedQuestions.length === 0) {
+                alert('Nenhuma questão disponível para revisão. Complete um simulado primeiro!');
+                return;
+            }
+            
+            localStorage.setItem('examMode', 'revisao');
+            window.location.href = 'simulado.html';
+        }
+    </script>
+</body>
+</html>

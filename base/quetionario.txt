@@ -1,0 +1,327 @@
+Domínio 1: Desenvolvimento com Serviços AWS
+Pergunta 1/5
+Uma função AWS Lambda precisa acessar um banco de dados Amazon RDS e um cluster Amazon ElastiCache, ambos localizados dentro de uma VPC privada. A função também precisa fazer chamadas para APIs externas na internet para buscar dados. Qual configuração é necessária para que a função opere corretamente? (Escolha DUAS)
+
+A. Anexar uma Internet Gateway diretamente à função Lambda.
+
+B. Configurar a função Lambda para ser executada dentro da VPC, em sub-redes privadas.
+
+C. Criar um VPC Endpoint para o Amazon S3.
+
+D. Configurar um NAT Gateway na sub-rede pública da VPC e ajustar as tabelas de roteamento das sub-redes privadas para direcionar o tráfego da internet para ele.
+
+E. Associar um Endereço IP Elástico à função Lambda.
+
+Respostas Corretas: B, D
+Justificativa: Para que a Lambda acesse recursos dentro de uma VPC (como RDS e ElastiCache), ela deve ser configurada para operar dentro dessa VPC (B). Uma vez dentro da VPC, para acessar a internet pública, a função em uma sub-rede privada precisa que seu tráfego seja roteado através de um NAT Gateway localizado em uma sub-rede pública (D). Uma Internet Gateway (A) só pode ser anexada à VPC, não diretamente a uma Lambda, e serve para a sub-rede pública.
+
+Documentação da AWS: Configuring Lambda function access to resources in a VPC
+
+Pergunta 2/5
+Um desenvolvedor precisa conceder acesso temporário a um usuário para que ele possa fazer o upload de um único arquivo em um bucket S3 privado, sem criar um usuário IAM para ele. A permissão deve expirar após 15 minutos. Qual é a maneira mais segura e eficiente de conseguir isso?
+
+A. Usar o AWS STS AssumeRole para gerar credenciais temporárias e enviá-las ao usuário.
+
+B. Gerar uma URL pré-assinada (Pre-signed URL) do S3 com a ação PutObject.
+
+C. Criar uma política de bucket S3 que permita o acesso anônimo com um Condition baseado no endereço IP do usuário.
+
+D. Adicionar temporariamente o usuário a um Grupo IAM que tenha permissão de escrita no bucket e removê-lo após 15 minutos.
+
+Resposta Correta: B
+Justificativa: URLs pré-assinadas são o mecanismo ideal para conceder acesso temporário e limitado a objetos específicos no S3. O desenvolvedor pode gerar uma URL usando suas próprias credenciais, especificando a ação (PutObject), o nome do objeto e um tempo de expiração. O usuário final não precisa de credenciais da AWS, apenas da URL.
+
+Documentação da AWS: Sharing objects using presigned URLs
+
+Pergunta 3/5
+Uma aplicação processa mensagens de uma fila SQS Padrão (Standard) usando uma função Lambda como consumidor. Durante o processamento, a função Lambda encontra um erro inesperado e falha sem conseguir processar a mensagem. O que acontecerá com a mensagem e qual é a melhor prática para lidar com falhas persistentes?
+
+A. A mensagem é excluída da fila permanentemente. A melhor prática é registrar o erro no CloudWatch Logs.
+
+B. A mensagem permanece na fila e, após o tempo de visibilidade (visibility timeout) expirar, torna-se visível para ser consumida novamente. A melhor prática é configurar uma Dead-Letter Queue (DLQ) na fila SQS de origem.
+
+C. A mensagem é movida automaticamente para uma fila de falhas separada criada pelo AWS Lambda. A melhor prática é monitorar essa fila.
+
+D. A mensagem é retida pela função Lambda, que tentará reprocessá-la indefinidamente até ter sucesso.
+
+Resposta Correta: B
+Justificativa: Quando um consumidor Lambda falha ao processar uma mensagem de uma fila SQS, a mensagem não é excluída. Ela se torna visível novamente após o "visibility timeout". Se a mensagem continuar causando falhas, ela pode ser reprocessada várias vezes, causando custos e sobrecarga. A melhor prática é configurar uma Dead-Letter Queue (DLQ), que é outra fila SQS para onde as mensagens são enviadas após um número configurado de falhas de processamento.
+
+Documentação da AWS: Using AWS Lambda with Amazon SQS - Error handling
+
+Pergunta 4/5
+Um desenvolvedor está construindo uma API REST usando API Gateway e AWS Lambda. Para uma rota específica (/users/{userId}), ele precisa garantir que apenas usuários autenticados que pertencem a um grupo "Admins" possam acessá-la. O sistema de identidade da empresa é gerenciado pelo Amazon Cognito User Pools. Qual é o método mais direto e seguro para implementar essa autorização?
+
+A. Usar uma Chave de API (API Key) e associá-la a um plano de uso.
+
+B. No código da função Lambda, receber o ID do usuário e verificar manualmente se ele pertence ao grupo "Admins" fazendo uma chamada à API do Cognito.
+
+C. Configurar um Autorizador do Cognito User Pools na rota da API Gateway e especificar o escopo (scope) necessário para o acesso.
+
+D. Usar um Autorizador Lambda (Lambda Authorizer) que recebe o token e retorna uma política IAM negando o acesso por padrão.
+
+Resposta Correta: C
+Justificativa: A API Gateway tem integração nativa com o Cognito User Pools para autorização. Essa é a maneira mais segura e gerenciada. Ao configurar um Autorizador do Cognito, a API Gateway valida automaticamente o token JWT (JSON Web Token) enviado pelo cliente. Isso acontece antes de invocar a função Lambda, garantindo que a lógica de negócios só seja executada para usuários autenticados e autorizados.
+
+Documentação da AWS: Control access to a REST API using Amazon Cognito user pools
+
+Pergunta 5/5
+Ao consultar uma tabela DynamoDB que contém dados de pedidos de clientes, um desenvolvedor precisa buscar todos os pedidos de um cliente específico (CustomerId) que foram feitos após uma determinada data (OrderDate). A tabela tem CustomerId como Chave de Partição e OrderDate como Chave de Classificação (Sort Key). Qual operação da API do DynamoDB deve ser usada para maior eficiência?
+
+A. Scan com um FilterExpression para CustomerId e OrderDate.
+
+B. GetItem, fornecendo o CustomerId e OrderDate.
+
+C. Query, usando uma KeyConditionExpression para CustomerId e OrderDate.
+
+D. BatchGetItem, fornecendo uma lista de todos os CustomerId possíveis.
+
+Resposta Correta: C
+Justificativa: A operação Query é a mais eficiente para buscar múltiplos itens que compartilham a mesma chave de partição. Como a tabela foi projetada corretamente com CustomerId (Partition Key) e OrderDate (Sort Key), uma Query pode usar a KeyConditionExpression para encontrar rapidamente o cliente e filtrar os resultados pela data com alta performance. Scan (A) leria a tabela inteira, sendo muito ineficiente e caro. GetItem (B) busca apenas um único item.
+
+Documentação da AWS: Querying a table in DynamoDB
+
+Domínio 2: Segurança
+Pergunta 1/5
+Um administrador de rede precisa implementar regras de firewall para uma sub-rede que hospeda servidores web. A política de segurança exige que o tráfego de entrada na porta 443 (HTTPS) seja permitido a partir de qualquer lugar, mas todo o tráfego de saída, exceto para atualizações de patches de um repositório com IP específico na porta 80, seja explicitamente bloqueado. Qual combinação de serviços de segurança da AWS atende a esses requisitos?
+
+A. Um Security Group permitindo entrada na porta 443 e permitindo toda a saída.
+
+B. Uma Network ACL (NACL) com regras de entrada para permitir a porta 443 e regras de saída para permitir a porta 80 para o IP específico e negar todo o resto.
+
+C. Um AWS WAF associado a um Application Load Balancer para filtrar o tráfego de entrada.
+
+D. Um Security Group permitindo a entrada na porta 443 e uma NACL para negar o tráfego de saída.
+
+Resposta Correta: B
+Justificativa: Security Groups são "stateful", o que significa que se o tráfego de entrada é permitido, o tráfego de resposta de saída é automaticamente permitido. Eles não podem ser usados para criar regras de negação (deny) explícitas. Network ACLs são "stateless" e operam no nível da sub-rede. Elas exigem regras explícitas tanto para entrada quanto para saída e suportam regras de "deny". Portanto, a NACL é a ferramenta correta para bloquear explicitamente o tráfego de saída indesejado.
+
+Documentação da AWS: Network ACLs vs. security groups
+
+Pergunta 2/5
+Uma aplicação rodando na Conta AWS 111111111111 precisa ler arquivos de log armazenados em um bucket S3 na Conta AWS 999999999999. Qual é a configuração correta para permitir este acesso entre contas seguindo as melhores práticas de segurança? (Escolha DUAS)
+
+A. Na conta 999999999999, criar uma IAM Role com uma política de permissão para ler o bucket e uma política de confiança (trust policy) que permita à conta 111111111111 assumir essa role.
+
+B. Na conta 111111111111, criar um usuário IAM e compartilhar suas chaves de acesso com a aplicação na conta 999999999999.
+
+C. Na conta 111111111111, garantir que a IAM Role ou usuário da aplicação tenha a permissão sts:AssumeRole para a role criada na conta 999999999999.
+
+D. Tornar o bucket S3 na conta 999999999999 publicamente acessível.
+
+E. Configurar o S3 Cross-Region Replication da conta 999999999999 para a conta 111111111111.
+
+Respostas Corretas: A, C
+Justificativa: O acesso seguro entre contas da AWS é feito através de IAM Roles. A conta que possui o recurso (Conta 999999999999) cria uma role que concede a permissão desejada e estabelece uma relação de confiança com a outra conta (A). A conta que precisa do acesso (Conta 111111111111) deve ter uma identidade (usuário ou role) com permissão para "assumir" essa role externa usando sts:AssumeRole (C).
+
+Documentação da AWS: IAM tutorial: Delegate access across AWS accounts using IAM roles
+
+Pergunta 3/5
+Uma empresa está armazenando dados de clientes em volumes Amazon EBS. A política de conformidade da empresa exige que todos os dados em repouso (at-rest) sejam criptografados. Qual é a maneira mais simples e eficaz de garantir que todos os novos volumes EBS criados na região sejam criptografados sem depender da ação dos desenvolvedores?
+
+A. Criar um script que periodicamente verifica todos os volumes EBS e criptografa os que não estão criptografados.
+
+B. Habilitar a opção "EBS encryption by default" (Criptografia do EBS por padrão) nas configurações da conta para a região específica.
+
+C. Usar AWS Config para detectar volumes não criptografados e acionar uma função Lambda para excluí-los.
+
+D. Anexar uma política IAM a todos os usuários que nega a ação ec2:CreateVolume se a criptografia não for especificada.
+
+Resposta Correta: B
+Justificativa: A funcionalidade "EBS encryption by default" é um recurso de configuração regional simples que garante que todos os novos volumes EBS criados naquela região sejam automaticamente criptografados. Isso impõe a política de conformidade de forma transparente, sem a necessidade de scripts complexos (A), ações corretivas reativas (C) ou políticas IAM restritivas que podem causar falhas em automações (D).
+
+Documentação da AWS: Encryption by default
+
+Pergunta 4/5
+Uma função Lambda precisa se conectar a um banco de dados Amazon RDS. Para manter as credenciais do banco de dados (usuário e senha) seguras, qual serviço da AWS deve ser usado para armazenar e rotacionar essas credenciais automaticamente, seguindo as melhores práticas?
+
+A. Armazenar as credenciais como variáveis de ambiente da função Lambda.
+
+B. Armazenar as credenciais em um arquivo de texto dentro do pacote de implantação da função Lambda.
+
+C. Usar o AWS Secrets Manager para armazenar as credenciais e configurar a rotação automática.
+
+D. Usar o AWS Systems Manager Parameter Store com um tipo String padrão.
+
+Resposta Correta: C
+Justificativa: AWS Secrets Manager é o serviço projetado especificamente para gerenciar segredos, como credenciais de banco de dados. Ele oferece integração nativa com o RDS para rotacionar senhas automaticamente sem a necessidade de intervenção manual ou de reimplantar o código da aplicação. Variáveis de ambiente (A) são visíveis no console e menos seguras. Armazenar em código (B) é uma péssima prática. O Parameter Store pode armazenar segredos (usando SecureString), mas o Secrets Manager oferece o benefício adicional da rotação automática de credenciais para serviços como o RDS.
+
+Documentação da AWS: What Is AWS Secrets Manager?
+
+Pergunta 5/5
+Uma organização tem uma política de segurança rigorosa que impede o acesso de gerenciamento (SSH na porta 22) às suas instâncias EC2 a partir da internet pública. No entanto, os administradores precisam de acesso ocasional para solucionar problemas. Qual é a solução mais segura e gerenciada que a AWS oferece para fornecer acesso de shell seguro sem expor portas de entrada?
+
+A. Configurar um Security Group para permitir a entrada na porta 22 a partir do endereço IP do escritório, abrindo e fechando a regra conforme necessário.
+
+B. Usar o AWS Systems Manager Session Manager para iniciar uma sessão de shell segura.
+
+C. Criar uma instância "bastion host" (jump box) em uma sub-rede pública para intermediar a conexão SSH.
+
+D. Instalar um cliente VPN na instância EC2 e conectar-se através de uma VPN corporativa.
+
+Resposta Correta: B
+Justificativa: O AWS Systems Manager Session Manager é a solução moderna e mais segura da AWS para este problema. Ele permite acesso de shell e CLI através de um túnel seguro iniciado pelo agente do SSM na instância, sem a necessidade de abrir portas de entrada (como a porta 22), configurar bastion hosts ou gerenciar chaves SSH. O acesso é controlado e auditado via IAM.
+
+Documentação da AWS: AWS Systems Manager Session Manager
+
+Domínio 3: Implantação
+Pergunta 1/5
+Um desenvolvedor precisa implantar uma aplicação web baseada em Docker no AWS Elastic Beanstalk. Ele já tem um Dockerfile no repositório do projeto. Qual arquivo adicional ele precisa criar na raiz do projeto para que o Elastic Beanstalk possa construir e executar o contêiner Docker corretamente?
+
+A. appspec.yml
+
+B. buildspec.yml
+
+C. Dockerrun.aws.json
+
+D. template.yaml
+
+Resposta Correta: C
+Justificativa: O Elastic Beanstalk usa o arquivo Dockerrun.aws.json para entender como implantar aplicações Docker. Este arquivo de configuração descreve como construir a imagem Docker a partir de um Dockerfile ou como usar uma imagem pré-construída de um repositório, além de definir portas e volumes. appspec.yml é para o CodeDeploy, buildspec.yml é para o CodeBuild e template.yaml é para o AWS SAM.
+
+Documentação da AWS: Deploying Elastic Beanstalk applications from Docker containers
+
+Pergunta 2/5
+Uma equipe está usando o AWS CloudFormation para gerenciar sua infraestrutura como código. Antes de aplicar uma atualização em uma stack de produção crítica, a equipe quer saber exatamente quais recursos serão criados, modificados ou excluídos. Qual recurso do CloudFormation deve ser usado para obter essa pré-visualização?
+
+A. Stack Policies
+
+B. Change Sets
+
+C. Drift Detection
+
+D. StackSets
+
+Resposta Correta: B
+Justificativa: Change Sets (Conjuntos de Alterações) são a funcionalidade do CloudFormation projetada para este propósito. Ao criar um change set, você envia as modificações do seu template, e o CloudFormation compara o template atual com o novo, gerando uma lista detalhada de todas as mudanças propostas. Você pode então revisar essas mudanças e decidir se quer executá-las ou não.
+
+Documentação da AWS: Updating stacks using change sets
+
+Pergunta 3/5
+Qual é a principal função do arquivo appspec.yml no contexto do serviço AWS CodeDeploy?
+
+A. Definir os comandos e o ambiente de tempo de execução para construir o código-fonte da aplicação.
+
+B. Declarar os recursos da AWS (EC2, S3, etc.) que compõem a aplicação.
+
+C. Orquestrar as diferentes etapas de um pipeline de CI/CD, como Source, Build e Deploy.
+
+D. Especificar os arquivos a serem copiados e os scripts a serem executados em cada fase do ciclo de vida da implantação (hooks) nas instâncias de destino.
+
+Resposta Correta: D
+Justificativa: O Arquivo de Especificação de Aplicação (appspec.yml) é o arquivo de configuração central para o CodeDeploy. Ele define tudo que o agente do CodeDeploy precisa saber para implantar a aplicação na instância EC2 ou função Lambda. Isso inclui a origem (onde estão os arquivos da aplicação) e os "hooks", que são scripts a serem executados em diferentes momentos do processo de implantação, como BeforeInstall, AfterInstall e ApplicationStart.
+
+Documentação da AWS: AppSpec File reference
+
+Pergunta 4/5
+Uma organização quer implantar uma nova versão de sua aplicação em um ambiente AWS Elastic Beanstalk com o mínimo de impacto para os usuários e a capacidade de reverter rapidamente em caso de falha. A estratégia deve envolver o provisionamento de um conjunto completo de novas instâncias com a nova versão, e então redirecionar o tráfego para elas somente após estarem totalmente operacionais. Qual política de implantação atende a esses requisitos?
+
+A. All at once
+
+B. Rolling
+
+C. Rolling with additional batch
+
+D. Blue/Green
+
+Resposta Correta: D
+Justificativa: A implantação Blue/Green é a estratégia que melhor descreve o cenário. Um novo ambiente ("Green") é criado com a nova versão da aplicação, espelhando o ambiente de produção existente ("Blue"). Após todos os testes e validações no ambiente Green, o tráfego é trocado (geralmente com uma alteração de DNS/CNAME) do Blue para o Green. Isso permite uma transição quase instantânea e uma reversão igualmente rápida, simplesmente trocando o tráfego de volta para o ambiente Blue se algo der errado.
+
+Documentação da AWS: Blue/Green deployments with Elastic Beanstalk
+
+Pergunta 5/5
+Um desenvolvedor quer usar o AWS Serverless Application Model (SAM) para definir e implantar uma aplicação simples que consiste em uma função Lambda, uma API Gateway que a aciona e uma tabela DynamoDB. Qual comando da AWS SAM CLI ele deve usar para empacotar o código da aplicação e o template SAM, e gerar um novo template pronto para ser implantado no CloudFormation?
+
+A. sam deploy
+
+B. sam build
+
+C. sam package
+
+D. sam init
+
+Resposta Correta: C
+Justificativa: O comando sam package é usado para preparar a aplicação para a implantação. Ele faz o upload do código da aplicação (ex: o zip da função Lambda) para um bucket S3 e cria um novo template (packaged.yaml) onde a referência local do código é substituída pela URI do S3. Este novo template é o artefato que é então usado pelo CloudFormation (seja manualmente ou via sam deploy) para efetivamente implantar a stack. O comando sam deploy faz o package e o deploy juntos.
+
+Documentação da AWS: AWS SAM CLI command reference - sam package
+
+Domínio 4: Otimização e Solução de Problemas
+Pergunta 1/5
+Uma empresa executa uma aplicação web em instâncias EC2 por trás de um Application Load Balancer. A carga de trabalho é estável e previsível, rodando 24/7 durante todo o ano. A equipe de finanças quer reduzir os custos da AWS com o maior desconto possível. Qual modelo de compra de instâncias EC2 oferece o maior desconto em troca de um compromisso de longo prazo (1 ou 3 anos) para um tipo de instância específico em uma região específica?
+
+A. On-Demand Instances
+
+B. Spot Instances
+
+C. Standard Reserved Instances
+
+D. Savings Plans
+
+Resposta Correta: C
+Justificativa: Para uma carga de trabalho extremamente previsível (mesmo tipo de instância, mesma região), as Instâncias Reservadas (Reserved Instances - RIs) do tipo Standard oferecem o maior desconto em comparação com o preço On-Demand. Savings Plans (D) oferecem mais flexibilidade (permitindo a troca de tipo de instância dentro de uma família), mas o desconto pode ser ligeiramente menor que o de uma RI Standard para um caso de uso tão específico e imutável. Spot (B) é para cargas de trabalho que podem ser interrompidas e não é adequado para uma aplicação 24/7.
+
+Documentação da AWS: Reserved Instances
+
+Pergunta 2/5
+Os usuários de uma aplicação estão reclamando de lentidão ao carregar páginas que exibem dados de um banco de dados RDS (PostgreSQL). A análise das métricas do CloudWatch para a instância RDS mostra uma alta utilização da CPU e um alto ReadIOPS. A investigação revela que a maioria das leituras são para dados que mudam raramente. Qual é a estratégia de otimização mais eficaz e com menor impacto na aplicação para aliviar a carga no banco de dados e melhorar a performance?
+
+A. Aumentar o tamanho da instância RDS (scale up).
+
+B. Implementar uma camada de cache na memória, como o Amazon ElastiCache for Redis, para armazenar os resultados das consultas frequentes.
+
+C. Migrar a aplicação para usar o DynamoDB em vez do RDS.
+
+D. Criar várias réplicas de leitura (Read Replicas) do banco de dados e distribuir as leituras entre elas.
+
+Resposta Correta: B
+Justificativa: Implementar um cache como o ElastiCache é a solução ideal para cenários com alta carga de leitura de dados que não mudam com frequência. A aplicação pode primeiro verificar se os dados estão no cache; se estiverem, ela os retorna rapidamente sem tocar no banco de dados. Isso reduz drasticamente as IOPS de leitura e a carga da CPU no RDS. Aumentar a instância (A) resolve o sintoma, mas é mais caro e não tão eficiente quanto o cache. Réplicas de leitura (D) ajudam, mas exigem mudanças na lógica da aplicação para direcionar as leituras e são mais complexas de gerenciar do que um cache para este caso de uso.
+
+Documentação da AWS: Database Caching Strategies Using Redis
+
+Pergunta 3/5
+Uma função Lambda está apresentando um comportamento lento na primeira invocação após um período de inatividade, um fenômeno conhecido como "cold start". A aplicação é sensível à latência e precisa de tempos de resposta consistentemente baixos. Qual recurso do AWS Lambda deve ser configurado para mitigar esse problema, mantendo as funções inicializadas e prontas para responder imediatamente?
+
+A. Aumentar a alocação de memória da função.
+
+B. Configurar "Provisioned Concurrency" (Simultaneidade Provisionada) para a função.
+
+C. Aumentar o timeout da função para permitir mais tempo para a inicialização.
+
+D. Usar Lambda Layers para reduzir o tamanho do pacote de implantação.
+
+Resposta Correta: B
+Justificativa: A Simultaneidade Provisionada (Provisioned Concurrency) foi criada especificamente para resolver o problema do cold start. Ela mantém um número configurado de ambientes de execução da função inicializados ("quentes") e prontos para responder às invocações instantaneamente. Aumentar a memória (A) pode ajudar a reduzir a duração do cold start, mas não o elimina. Reduzir o tamanho do pacote (D) também ajuda, mas a solução definitiva e garantida é a Simultaneidade Provisionada.
+
+Documentação da AWS: Configuring provisioned concurrency
+
+Pergunta 4/5
+Uma empresa armazena terabytes de logs no Amazon S3. Os logs são acessados com frequência no primeiro mês para análise. Após 30 dias, eles raramente são acessados, mas precisam ser mantidos por 7 anos para fins de conformidade e devem estar disponíveis para consulta em algumas horas, se necessário. Qual é a maneira mais econômica de gerenciar o ciclo de vida desses objetos no S3?
+
+A. Manter todos os logs na classe de armazenamento S3 Standard por 7 anos.
+
+B. Usar uma política de ciclo de vida do S3 para mover os objetos do S3 Standard para o S3 Glacier Deep Archive após 30 dias.
+
+C. Usar uma política de ciclo de vida do S3 para mover os objetos do S3 Standard para o S3 Standard-Infrequent Access (S3 Standard-IA) após 30 dias, e depois para o S3 Glacier Flexible Retrieval após 90 dias.
+
+D. Escrever um script para baixar os logs para um armazenamento on-premises após 30 dias.
+
+Resposta Correta: C
+Justificativa: Esta estratégia de ciclo de vida otimiza os custos. S3 Standard é ideal para acesso frequente. Após 30 dias, mover para S3 Standard-IA reduz os custos de armazenamento para dados acessados com menos frequência, mas ainda disponíveis instantaneamente. Após mais tempo (ex: 90 dias), mover para S3 Glacier Flexible Retrieval reduz ainda mais os custos de armazenamento para arquivamento de longo prazo, atendendo ao requisito de recuperação em horas. Mover diretamente para o Glacier Deep Archive (B) pode ser muito lento para recuperação (12 horas+) e menos flexível.
+
+Documentação da AWS: Managing your storage lifecycle
+
+Pergunta 5/5
+Um desenvolvedor nota que sua aplicação, rodando em uma instância EC2, está frequentemente atingindo 100% de utilização de CPU, causando lentidão. Ele precisa entender quais processos específicos na instância estão consumindo mais CPU, mas não quer usar SSH para se conectar à máquina toda vez. Qual serviço da AWS pode ser configurado para coletar métricas detalhadas no nível do sistema operacional (como utilização de memória e de processos) e visualizá-las no console da AWS?
+
+A. AWS CloudTrail
+
+B. VPC Flow Logs
+
+C. Amazon CloudWatch agent
+
+D. AWS Health Dashboard
+
+Resposta Correta: C
+Justificativa: As métricas padrão do CloudWatch para EC2 (coletadas do hypervisor) incluem a utilização da CPU da instância como um todo, mas não fornecem detalhes sobre processos individuais ou uso de memória. Para obter essas métricas detalhadas do sistema operacional, é necessário instalar e configurar o agente do CloudWatch (CloudWatch agent) na instância EC2. O agente pode coletar métricas personalizadas e logs e enviá-los ao CloudWatch para monitoramento, criação de painéis e alarmes.
+
+Documentação da AWS: Collecting metrics and logs from Amazon EC2 instances and on-premises servers with the CloudWatch agent

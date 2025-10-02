@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultado do Simulado AWS DVA-C02</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="aws-logo">
+                <span class="aws-text">AWS</span>
+            </div>
+            <h1>Resultado do Simulado DVA-C02</h1>
+            <p class="subtitle">AWS Certified Developer Associate</p>
+        </header>
+
+        <main class="main-content">
+            <div class="result-container">
+                <!-- Resultado Principal -->
+                <div class="main-result">
+                    <div class="score-circle" id="score-circle">
+                        <div class="score-content">
+                            <div class="aws-score" id="aws-score">720</div>
+                            <div class="score-label">Pontuação AWS</div>
+                        </div>
+                    </div>
+                    
+                    <div class="result-info">
+                        <div class="result-status" id="result-status">
+                            <span class="status-icon">✅</span>
+                            <span class="status-text">APROVADO</span>
+                        </div>
+                        
+                        <div class="result-stats">
+                            <div class="stat-item">
+                                <span class="stat-value" id="correct-answers">45</span>
+                                <span class="stat-label">Acertos</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value" id="percentage">69.2%</span>
+                                <span class="stat-label">Percentual</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value" id="time-spent">98min</span>
+                                <span class="stat-label">Tempo Gasto</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Análise por Domínio -->
+                <div class="domain-analysis">
+                    <h2>Análise por Domínio</h2>
+                    <div class="domains-grid" id="domains-grid">
+                        <!-- Domínios serão inseridos dinamicamente -->
+                    </div>
+                </div>
+
+                <!-- Revisão Detalhada -->
+                <div class="detailed-review">
+                    <h2>Revisão Detalhada</h2>
+                    <div class="review-controls">
+                        <button id="show-all" class="filter-button active">Todas</button>
+                        <button id="show-incorrect" class="filter-button">Incorretas</button>
+                        <button id="show-flagged" class="filter-button">Marcadas</button>
+                    </div>
+                    
+                    <div class="questions-review" id="questions-review">
+                        <!-- Questões serão inseridas dinamicamente -->
+                    </div>
+                </div>
+
+                <!-- Ações -->
+                <div class="actions-section">
+                    <button id="new-exam" class="action-button primary">Novo Simulado</button>
+                    <button id="review-incorrect" class="action-button secondary">Revisar Incorretas</button>
+                    <button id="back-home" class="action-button secondary">Voltar ao Início</button>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>&copy; 2024 Simulado AWS DVA-C02 - Preparação para Certificação</p>
+        </footer>
+    </div>
+
+    <script src="questions-database.js"></script>
+    <script src="resultado.js"></script>
+</body>
+</html>
